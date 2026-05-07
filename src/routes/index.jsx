@@ -4,6 +4,7 @@ import PublicLayout from "@/layouts/PublicLayout";
 import LearningLayout from "@/layouts/LearningLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
+import Login from "@/features/auth/pages/Login";
 
 export const router = createBrowserRouter([
     {
@@ -30,4 +31,5 @@ export const router = createBrowserRouter([
         ),
         children: [{ path: "/dashboard", element: <h1>Dashboard</h1> }],
     },
+    { path: "/login", element: <Login /> },
 ]);

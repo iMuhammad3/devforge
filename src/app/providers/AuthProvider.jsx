@@ -3,7 +3,11 @@ import { initAuthListener } from "@/services/firebase/auth";
 
 export default function AuthProvider({ children }) {
   useEffect(() => {
-    initAuthListener();
+    const unsubscribe = initAuthListener();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   return children;

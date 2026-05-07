@@ -12,7 +12,9 @@ const provider = new GoogleAuthProvider();
 
 export const loginWithGoogle = async () => {
   const result = await signInWithPopup(auth, provider);
-  return result.user;
+  const user = result.user;
+
+  return user;
 };
 
 export const logoutUser = () => {
@@ -23,8 +25,10 @@ export const logoutUser = () => {
 export const initAuthListener = () => {
   const { setUser, setLoading } = useAuthStore.getState();
 
-  onAuthStateChanged(auth, (user) => {
+  const unsubscribe = onAuthStateChanged(auth, (user) => {
     setUser(user || null);
     setLoading(false);
   });
+
+  return unsubscribe;
 };

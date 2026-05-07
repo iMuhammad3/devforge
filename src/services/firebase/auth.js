@@ -6,8 +6,8 @@ import {
 } from "firebase/auth";
 
 import { auth } from "./config";
+import { useAuthStore } from "@/features/auth/store/authStore";
 
-// Google login
 const provider = new GoogleAuthProvider();
 
 export const loginWithGoogle = async () => {
@@ -15,12 +15,16 @@ export const loginWithGoogle = async () => {
   return result.user;
 };
 
-// logout
 export const logoutUser = () => {
   return signOut(auth);
 };
 
-// listen to auth state
-export const subscribeToAuthChanges = (callback) => {
-  return onAuthStateChanged(auth, callback);
+// 👇 GLOBAL AUTH LISTENER 
+export const initAuthListener = () => {
+  const { setUser, setLoading } = useAuthStore.getState();
+
+  onAuthStateChanged(auth, (user) => {
+    setUser(user || null);
+    setLoading(false);
+  });
 };

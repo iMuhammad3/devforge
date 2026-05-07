@@ -5,9 +5,12 @@ import { router } from "./routes";
 import './index.css'
 import "@/styles/globals.css"
 import "@/styles/themes.css"
+import AuthProvider from './app/providers/AuthProvider';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 )

@@ -11,6 +11,7 @@ import { HomePage } from "@/features/home";
 import { DashboardPage } from "@/features/dashboard";
 import { SettingsPage } from "@/features/settings";
 import { ProfilePage } from "@/features/profile";
+import { BookmarksPage } from "@/features/bookmarks";
 
 export const router = createBrowserRouter([
     {
@@ -40,6 +41,7 @@ export const router = createBrowserRouter([
             { path: "/dashboard", element: <DashboardPage /> },
             { path: "/settings", element: <SettingsPage /> },
             { path: "/profile", element: <ProfilePage /> },
+            { path: "/bookmarks", element: <BookmarksPage /> },
         ],
     },
     { path: "/login", element: <Login /> },

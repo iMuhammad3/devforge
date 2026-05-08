@@ -8,6 +8,8 @@ import {
   orderBy,
   setDoc,
   updateDoc,
+  deleteDoc,
+  addDoc,
 } from "firebase/firestore";
 
 import { db } from "./config";
@@ -156,4 +158,68 @@ export const getLessonBySlug = async (courseSlug, lessonSlug) => {
     id: lessonDoc.id,
     ...lessonDoc.data(),
   };
+};
+
+/**
+ * BOOKMARKS
+ */
+export const getUserBookmarks = async (userId) => {
+  const bookmarksRef = collection(db, "bookmarks");
+
+  const q = query(bookmarksRef, where("userId", "==", userId));
+
+  const snap = await getDocs(q);
+
+  const bookmarks = snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  return bookmarks.sort((a, b) => {
+    const dateA = a.createdAt?.toDate?.() || new Date(0);
+    const dateB = b.createdAt?.toDate?.() || new Date(0);
+
+    return dateB - dateA;
+  });
+};
+
+export const getLessonBookmark = async (userId, lessonId) => {
+  const bookmarksRef = collection(db, "bookmarks");
+
+  const q = query(
+    bookmarksRef,
+    where("userId", "==", userId),
+    where("lessonId", "==", lessonId)
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) return null;
+
+  const bookmarkDoc = snap.docs[0];
+
+  return {
+    id: bookmarkDoc.id,
+    ...bookmarkDoc.data(),
+  };
+};
+
+export const createLessonBookmark = async (bookmarkData) => {
+  const bookmarksRef = collection(db, "bookmarks");
+
+  const docRef = await addDoc(bookmarksRef, {
+    ...bookmarkData,
+    createdAt: new Date(),
+  });
+
+  return {
+    id: docRef.id,
+    ...bookmarkData,
+  };
+};
+
+export const deleteLessonBookmark = async (bookmarkId) => {
+  const bookmarkRef = doc(db, "bookmarks", bookmarkId);
+
+  await deleteDoc(bookmarkRef);
 };

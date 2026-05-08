@@ -4,6 +4,7 @@ import MarkdownRenderer from "../components/MarkdownRenderer";
 
 import { fetchLessonBySlug, fetchLessonsByCourseSlug } from "../api/lessonsApi";
 import LessonSidebar from "../components/LessonSidebar";
+import BookmarkButton from "@/features/bookmarks/components/BookmarkButton";
 
 export default function LessonPage() {
     const { courseSlug, lessonSlug } = useParams();
@@ -115,6 +116,10 @@ export default function LessonPage() {
                                 {lesson.description}
                             </p>
                         )}
+
+                        <div className="mt-6">
+                            <BookmarkButton lesson={lesson} />
+                        </div>
                     </header>
 
                     <div className="mt-8">

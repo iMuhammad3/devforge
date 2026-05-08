@@ -1,13 +1,12 @@
 import { Outlet } from "react-router-dom";
+import Navbar from "@/shared/components/Navbar";
 
 export default function DashboardLayout() {
   return (
-    <div className="h-screen flex">
-      <aside className="w-64 border-r border-border p-4">
-        <h2 className="font-semibold">Dashboard</h2>
-      </aside>
+    <div className="min-h-screen bg-background text-foreground">
+      <Navbar />
 
-      <main className="flex-1 p-6">
+      <main className="mx-auto max-w-6xl px-6 py-10">
         <Outlet />
       </main>
     </div>

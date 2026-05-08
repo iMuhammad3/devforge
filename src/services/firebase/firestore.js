@@ -6,6 +6,7 @@ import {
   query,
   where,
   orderBy,
+  setDoc,
 } from "firebase/firestore";
 
 import { db } from "./config";
@@ -13,11 +14,53 @@ import { db } from "./config";
 /**
  * USERS
  */
-export const getUser = async (uid) => {
-  const ref = doc(db, "users", uid);
-  const snap = await getDoc(ref);
+export const createUserProfile = async (user) => {
+  const userRef = doc(db, "users", user.uid);
+  const userSnap = await getDoc(userRef);
 
-  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
+  // Do not overwrite existing profile
+  if (userSnap.exists()) {
+    return {
+      id: userSnap.id,
+      ...userSnap.data(),
+    };
+  }
+
+  const usernameBase =
+    user.displayName?.toLowerCase().replace(/\s+/g, "") ||
+    user.email?.split("@")[0] ||
+    "user";
+
+  const newUser = {
+    uid: user.uid,
+    email: user.email,
+    displayName: user.displayName || "",
+    username: usernameBase,
+    photoURL: user.photoURL || "",
+    role: "student",
+    bio: "",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  await setDoc(userRef, newUser);
+
+  return {
+    id: user.uid,
+    ...newUser,
+  };
+};
+
+export const getUserProfile = async (uid) => {
+  const userRef = doc(db, "users", uid);
+  const userSnap = await getDoc(userRef);
+
+  if (!userSnap.exists()) return null;
+
+  return {
+    id: userSnap.id,
+    ...userSnap.data(),
+  };
 };
 
 /**

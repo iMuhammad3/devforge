@@ -4,6 +4,7 @@ import { Bookmark, BookOpen } from "lucide-react";
 
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { fetchUserBookmarks } from "../api/bookmarksApi";
+import { EmptyState, ErrorState, LoadingState } from "@/shared/components/feedback";
 
 export default function BookmarksPage() {
   const user = useAuthStore((state) => state.user);
@@ -35,12 +36,17 @@ export default function BookmarksPage() {
   }, [user?.uid]);
 
   if (status === "loading") {
-    return <p className="text-muted-foreground">Loading bookmarks...</p>;
-  }
+  return (
+    <LoadingState
+      title="Loading bookmarks"
+      description="Fetching your saved lessons."
+    />
+  );
+}
 
   if (status === "error") {
-    return <p className="text-destructive">{error}</p>;
-  }
+  return <ErrorState description={error} />;
+}
 
   return (
     <section>
@@ -58,24 +64,19 @@ export default function BookmarksPage() {
       </div>
 
       {bookmarks.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-border bg-card p-8 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Bookmark className="h-5 w-5" />
-          </div>
-
-          <h2 className="text-lg font-semibold">No bookmarks yet</h2>
-
-          <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-            Open a lesson and click the bookmark button to save it here.
-          </p>
-
-          <Link
-            to="/courses"
-            className="mt-6 inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-          >
-            Browse courses
-          </Link>
-        </div>
+        <EmptyState
+  icon={<Bookmark className="h-5 w-5" />}
+  title="No bookmarks yet"
+  description="Open a lesson and click the bookmark button to save it here."
+  action={
+    <Link
+      to="/courses"
+      className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+    >
+      Browse courses
+    </Link>
+  }
+/>
       ) : (
         <div className="grid gap-4">
           {bookmarks.map((bookmark) => (

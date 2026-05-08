@@ -5,6 +5,8 @@ import MarkdownRenderer from "../components/MarkdownRenderer";
 import { fetchLessonBySlug, fetchLessonsByCourseSlug } from "../api/lessonsApi";
 import LessonSidebar from "../components/LessonSidebar";
 import BookmarkButton from "@/features/bookmarks/components/BookmarkButton";
+import { EmptyState, ErrorState, LoadingState } from "@/shared/components/feedback";
+import { BookOpen } from "lucide-react";
 
 export default function LessonPage() {
     const { courseSlug, lessonSlug } = useParams();
@@ -55,36 +57,41 @@ export default function LessonPage() {
             : null;
 
     if (status === "loading") {
-        return (
-            <div className="mx-auto max-w-3xl px-6 py-10">
-                <p className="text-muted-foreground">Loading lesson...</p>
-            </div>
-        );
-    }
+  return (
+    <LoadingState
+      title="Loading lesson"
+      description="Preparing your lesson content."
+    />
+  );
+}
 
     if (status === "not-found") {
-        return (
-            <div className="mx-auto max-w-3xl px-6 py-10">
-                <h1 className="text-2xl font-bold">Lesson not found</h1>
-
-                <Link
-                    to={`/courses/${courseSlug}`}
-                    className="mt-4 inline-block text-primary"
-                >
-                    Back to course
-                </Link>
-            </div>
-        );
-    }
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-10">
+      <EmptyState
+        icon={<BookOpen className="h-5 w-5" />}
+        title="Lesson not found"
+        description="This lesson does not exist, is unpublished, or the URL is incorrect."
+        action={
+          <Link
+            to={`/courses/${courseSlug}`}
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            Back to course
+          </Link>
+        }
+      />
+    </section>
+  );
+}
 
     if (status === "error") {
-        return (
-            <div className="mx-auto max-w-3xl px-6 py-10">
-                <p className="text-destructive">{error}</p>
-            </div>
-        );
-    }
-
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-10">
+      <ErrorState description={error} />
+    </section>
+  );
+}
     return (
         <div className="flex">
             <LessonSidebar

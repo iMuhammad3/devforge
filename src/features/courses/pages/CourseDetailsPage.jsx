@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { fetchCourseBySlug } from "../api/coursesApi";
 import { fetchLessonsByCourseSlug } from "@/features/lessons/api/lessonsApi";
 import LessonList from "@/features/lessons/components/LessonList";
+import { EmptyState, ErrorState, LoadingState } from "@/shared/components/feedback";
+import { BookOpen } from "lucide-react";
 
 export default function CourseDetailsPage() {
     const { slug } = useParams();
@@ -39,31 +41,40 @@ export default function CourseDetailsPage() {
     }, [slug]);
 
     if (status === "loading") {
-        return (
-            <div className="mx-auto max-w-4xl px-6 py-10">
-                <p className="text-muted-foreground">Loading course...</p>
-            </div>
-        );
-    }
-
+  return (
+    <LoadingState
+      title="Loading course"
+      description="Fetching course details and lessons."
+    />
+  );
+}
     if (status === "not-found") {
-        return (
-            <div className="mx-auto max-w-4xl px-6 py-10">
-                <h1 className="text-2xl font-bold">Course not found</h1>
-                <Link to="/courses" className="mt-4 inline-block text-primary">
-                    Back to courses
-                </Link>
-            </div>
-        );
-    }
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-10">
+      <EmptyState
+        icon={<BookOpen className="h-5 w-5" />}
+        title="Course not found"
+        description="This course does not exist, is unpublished, or the URL is incorrect."
+        action={
+          <Link
+            to="/courses"
+            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+          >
+            Back to courses
+          </Link>
+        }
+      />
+    </section>
+  );
+}
 
     if (status === "error") {
-        return (
-            <div className="mx-auto max-w-4xl px-6 py-10">
-                <p className="text-destructive">{error}</p>
-            </div>
-        );
-    }
+  return (
+    <section className="mx-auto max-w-4xl px-6 py-10">
+      <ErrorState description={error} />
+    </section>
+  );
+}
 
     return (
         <section className="mx-auto max-w-4xl px-6 py-10">

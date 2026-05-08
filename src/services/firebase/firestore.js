@@ -60,3 +60,47 @@ export const getCourseBySlug = async (slug) => {
     ...courseDoc.data(),
   };
 };
+
+/**
+ * LESSONS
+ */
+export const getLessonsByCourseSlug = async (courseSlug) => {
+  const lessonsRef = collection(db, "lessons");
+
+  const q = query(
+    lessonsRef,
+    where("courseSlug", "==", courseSlug),
+    where("published", "==", true)
+  );
+
+  const snap = await getDocs(q);
+
+  const lessons = snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  return lessons.sort((a, b) => a.order - b.order);
+};
+
+export const getLessonBySlug = async (courseSlug, lessonSlug) => {
+  const lessonsRef = collection(db, "lessons");
+
+  const q = query(
+    lessonsRef,
+    where("courseSlug", "==", courseSlug),
+    where("slug", "==", lessonSlug),
+    where("published", "==", true)
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) return null;
+
+  const lessonDoc = snap.docs[0];
+
+  return {
+    id: lessonDoc.id,
+    ...lessonDoc.data(),
+  };
+};

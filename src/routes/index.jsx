@@ -6,6 +6,7 @@ import DashboardLayout from "@/layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "@/features/auth/pages/Login";
 import { CoursesPage, CourseDetailsPage } from "@/features/courses";
+import { LessonPage } from "@/features/lessons";
 
 export const router = createBrowserRouter([
     {
@@ -34,4 +35,15 @@ export const router = createBrowserRouter([
         children: [{ path: "/dashboard", element: <h1>Dashboard</h1> }],
     },
     { path: "/login", element: <Login /> },
+    {
+        element: <LearningLayout />,
+        children: [
+            { path: "/courses", element: <CoursesPage /> },
+            { path: "/courses/:slug", element: <CourseDetailsPage /> },
+            {
+                path: "/courses/:courseSlug/lessons/:lessonSlug",
+                element: <LessonPage />,
+            },
+        ],
+    },
 ]);

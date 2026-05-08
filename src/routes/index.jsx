@@ -7,12 +7,13 @@ import ProtectedRoute from "./ProtectedRoute";
 import Login from "@/features/auth/pages/Login";
 import { CoursesPage, CourseDetailsPage } from "@/features/courses";
 import { LessonPage } from "@/features/lessons";
+import { HomePage } from "@/features/home";
 
 export const router = createBrowserRouter([
     {
         element: <PublicLayout />,
         children: [
-            { path: "/", element: <h1>Home</h1> },
+            { path: "/", element: <HomePage /> },
             { path: "/login", element: <h1>Login</h1> },
         ],
     },

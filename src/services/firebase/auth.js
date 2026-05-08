@@ -7,7 +7,7 @@ import {
 
 import { auth } from "./config";
 import { useAuthStore } from "@/features/auth/store/authStore";
-import { createUserProfile } from "@/services/firebase/firestore";
+import { createUserProfile, getUserProfile } from "@/services/firebase/firestore";
 
 const googleProvider = new GoogleAuthProvider();
 
@@ -25,10 +25,23 @@ export const logoutUser = () => {
 };
 
 export const initAuthListener = () => {
-  const { setUser, setLoading } = useAuthStore.getState();
+  const { setUser, setProfile, setLoading } = useAuthStore.getState();
 
-  const unsubscribe = onAuthStateChanged(auth, (user) => {
-    setUser(user || null);
+  const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    setLoading(true);
+
+    if (!user) {
+      setUser(null);
+      setProfile(null);
+      setLoading(false);
+      return;
+    }
+
+    setUser(user);
+
+    const profile = await getUserProfile(user.uid);
+    setProfile(profile);
+
     setLoading(false);
   });
 

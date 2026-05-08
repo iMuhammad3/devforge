@@ -7,6 +7,7 @@ import {
   where,
   orderBy,
   setDoc,
+  updateDoc,
 } from "firebase/firestore";
 
 import { db } from "./config";
@@ -61,6 +62,15 @@ export const getUserProfile = async (uid) => {
     id: userSnap.id,
     ...userSnap.data(),
   };
+};
+
+export const updateUserProfile = async (uid, data) => {
+  const userRef = doc(db, "users", uid);
+
+  await updateDoc(userRef, {
+    ...data,
+    updatedAt: new Date(),
+  });
 };
 
 /**

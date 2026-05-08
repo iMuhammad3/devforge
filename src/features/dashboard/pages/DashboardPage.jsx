@@ -5,6 +5,7 @@ import { useAuthStore } from "@/features/auth/store/authStore";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
+const profile = useAuthStore((state) => state.profile);
 
   return (
     <section>
@@ -12,7 +13,7 @@ export default function DashboardPage() {
         <p className="text-sm font-medium text-primary">Dashboard</p>
 
         <h1 className="mt-2 text-3xl font-bold tracking-tight md:text-4xl">
-          Welcome back{user?.displayName ? `, ${user.displayName}` : ""}.
+          Welcome back{profile?.displayName ? `, ${profile.displayName}` : ""}.
         </h1>
 
         <p className="mt-4 max-w-2xl text-muted-foreground">
@@ -22,7 +23,7 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_2fr]">
-        <UserCard user={user} />
+        <UserCard user={user} profile={profile} />
 
         <div className="grid gap-6">
           <QuickActions />
@@ -34,27 +35,35 @@ export default function DashboardPage() {
   );
 }
 
-function UserCard({ user }) {
+function UserCard({ user, profile }) {
+  const displayName = profile?.displayName || user?.displayName || "DevForge User";
+  const email = profile?.email || user?.email;
+  const photoURL = profile?.photoURL || user?.photoURL;
+
   return (
     <div className="rounded-2xl border border-border bg-card p-6">
       <div className="flex flex-col items-center text-center">
-        {user?.photoURL ? (
+        {photoURL ? (
           <img
-            src={user.photoURL}
-            alt={user.displayName || "User avatar"}
+            src={photoURL}
+            alt={displayName}
             className="h-20 w-20 rounded-full"
           />
         ) : (
           <div className="flex h-20 w-20 items-center justify-center rounded-full bg-muted text-2xl font-semibold">
-            {user?.displayName?.charAt(0) || "U"}
+            {displayName.charAt(0)}
           </div>
         )}
 
-        <h2 className="mt-4 text-xl font-semibold">
-          {user?.displayName || "DevForge User"}
-        </h2>
+        <h2 className="mt-4 text-xl font-semibold">{displayName}</h2>
 
-        <p className="mt-1 text-sm text-muted-foreground">{user?.email}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{email}</p>
+
+        {profile?.username && (
+          <p className="mt-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+            @{profile.username}
+          </p>
+        )}
       </div>
 
       <div className="mt-6 border-t border-border pt-6">

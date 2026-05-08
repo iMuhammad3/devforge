@@ -8,6 +8,7 @@ import Login from "@/features/auth/pages/Login";
 import { CoursesPage, CourseDetailsPage } from "@/features/courses";
 import { LessonPage } from "@/features/lessons";
 import { HomePage } from "@/features/home";
+import { DashboardPage } from "@/features/dashboard";
 
 export const router = createBrowserRouter([
     {
@@ -33,7 +34,7 @@ export const router = createBrowserRouter([
                 <DashboardLayout />
             </ProtectedRoute>
         ),
-        children: [{ path: "/dashboard", element: <h1>Dashboard</h1> }],
+        children: [{ path: "/dashboard", element: <DashboardPage /> }],
     },
     { path: "/login", element: <Login /> },
     {

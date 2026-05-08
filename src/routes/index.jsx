@@ -10,6 +10,7 @@ import { LessonPage } from "@/features/lessons";
 import { HomePage } from "@/features/home";
 import { DashboardPage } from "@/features/dashboard";
 import { SettingsPage } from "@/features/settings";
+import { ProfilePage } from "@/features/profile";
 
 export const router = createBrowserRouter([
     {
@@ -38,6 +39,7 @@ export const router = createBrowserRouter([
         children: [
             { path: "/dashboard", element: <DashboardPage /> },
             { path: "/settings", element: <SettingsPage /> },
+            { path: "/profile", element: <ProfilePage /> },
         ],
     },
     { path: "/login", element: <Login /> },

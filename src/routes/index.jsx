@@ -5,6 +5,7 @@ import LearningLayout from "@/layouts/LearningLayout";
 import DashboardLayout from "@/layouts/DashboardLayout";
 import ProtectedRoute from "./ProtectedRoute";
 import Login from "@/features/auth/pages/Login";
+import { CoursesPage, CourseDetailsPage } from "@/features/courses";
 
 export const router = createBrowserRouter([
     {
@@ -18,7 +19,8 @@ export const router = createBrowserRouter([
     {
         element: <LearningLayout />,
         children: [
-            { path: "/courses", element: <h1>Courses</h1> },
+            { path: "/courses", element: <CoursesPage /> },
+            { path: "/courses/:slug", element: <CourseDetailsPage /> },
             { path: "/lesson/:id", element: <h1>Lesson</h1> },
         ],
     },

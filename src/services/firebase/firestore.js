@@ -2,11 +2,10 @@ import {
   collection,
   doc,
   getDoc,
-  setDoc,
   getDocs,
-  addDoc,
   query,
   where,
+  orderBy,
 } from "firebase/firestore";
 
 import { db } from "./config";
@@ -14,33 +13,50 @@ import { db } from "./config";
 /**
  * USERS
  */
-export const createUser = async (user) => {
-  return setDoc(doc(db, "users", user.uid), {
-    uid: user.uid,
-    email: user.email,
-    displayName: user.displayName,
-    photoURL: user.photoURL,
-    createdAt: new Date(),
-  });
-};
-
 export const getUser = async (uid) => {
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
-  return snap.exists() ? snap.data() : null;
+
+  return snap.exists() ? { id: snap.id, ...snap.data() } : null;
 };
 
 /**
  * COURSES
  */
 export const getCourses = async () => {
-  const snap = await getDocs(collection(db, "courses"));
-  return snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const coursesRef = collection(db, "courses");
+
+  const q = query(
+    coursesRef,
+    where("published", "==", true),
+    orderBy("order", "asc")
+  );
+
+  const snap = await getDocs(q);
+
+  return snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
 };
 
 export const getCourseBySlug = async (slug) => {
-  const q = query(collection(db, "courses"), where("slug", "==", slug));
+  const coursesRef = collection(db, "courses");
+
+  const q = query(
+    coursesRef,
+    where("slug", "==", slug),
+    where("published", "==", true)
+  );
+
   const snap = await getDocs(q);
 
-  return snap.docs.length ? snap.docs[0].data() : null;
+  if (snap.empty) return null;
+
+  const courseDoc = snap.docs[0];
+
+  return {
+    id: courseDoc.id,
+    ...courseDoc.data(),
+  };
 };

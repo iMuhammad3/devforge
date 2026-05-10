@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
+import { CheckCircle2 } from "lucide-react";
 
 export default function LessonSidebar({
   courseSlug,
   lessons,
   currentLessonSlug,
+  completedLessonIds = [],
 }) {
   return (
     <aside className="hidden w-72 shrink-0 border-r border-border bg-background lg:block">
@@ -17,6 +19,7 @@ export default function LessonSidebar({
         <nav className="space-y-1">
           {lessons.map((lesson) => {
             const isActive = lesson.slug === currentLessonSlug;
+            const isCompleted = completedLessonIds.includes(lesson.id);
 
             return (
               <Link
@@ -30,12 +33,18 @@ export default function LessonSidebar({
               >
                 <span
                   className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs ${
-                    isActive
+                    isCompleted
+                      ? "bg-primary text-primary-foreground"
+                      : isActive
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
-                  {lesson.order}
+                  {isCompleted ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    lesson.order
+                  )}
                 </span>
 
                 <span className="line-clamp-2">{lesson.title}</span>

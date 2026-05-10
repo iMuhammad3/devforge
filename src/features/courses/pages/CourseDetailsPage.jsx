@@ -3,11 +3,19 @@ import { Link, useParams } from "react-router-dom";
 import { fetchCourseBySlug } from "../api/coursesApi";
 import { fetchLessonsByCourseSlug } from "@/features/lessons/api/lessonsApi";
 import LessonList from "@/features/lessons/components/LessonList";
-import { EmptyState, ErrorState, LoadingState } from "@/shared/components/feedback";
+import {
+    EmptyState,
+    ErrorState,
+    LoadingState,
+} from "@/shared/components/feedback";
 import { BookOpen } from "lucide-react";
+import { fetchUserCourseProgress } from "@/features/progress/api/progressApi";
+import { useAuthStore } from "@/features/auth/store/authStore";
 
 export default function CourseDetailsPage() {
     const { slug } = useParams();
+    const user = useAuthStore(state => state.user);
+    const [courseProgress, setCourseProgress] = useState([]);
 
     const [course, setCourse] = useState(null);
     const [lessons, setLessons] = useState([]);
@@ -28,6 +36,11 @@ export default function CourseDetailsPage() {
 
                 setCourse(data);
                 const lessonsData = await fetchLessonsByCourseSlug(slug);
+                const progressData = user?.uid
+                    ? await fetchUserCourseProgress(user.uid, slug)
+                    : [];
+
+                setCourseProgress(progressData);
                 setLessons(lessonsData);
                 setStatus("success");
             } catch (err) {
@@ -38,43 +51,50 @@ export default function CourseDetailsPage() {
         };
 
         loadCourse();
-    }, [slug]);
+    }, [slug, user?.uid]);
+    const completedCount = courseProgress.length;
+    const totalLessons = lessons.length;
+
+    const progressPercentage =
+        totalLessons > 0
+            ? Math.round((completedCount / totalLessons) * 100)
+            : 0;
 
     if (status === "loading") {
-  return (
-    <LoadingState
-      title="Loading course"
-      description="Fetching course details and lessons."
-    />
-  );
-}
+        return (
+            <LoadingState
+                title="Loading course"
+                description="Fetching course details and lessons."
+            />
+        );
+    }
     if (status === "not-found") {
-  return (
-    <section className="mx-auto max-w-4xl px-6 py-10">
-      <EmptyState
-        icon={<BookOpen className="h-5 w-5" />}
-        title="Course not found"
-        description="This course does not exist, is unpublished, or the URL is incorrect."
-        action={
-          <Link
-            to="/courses"
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-          >
-            Back to courses
-          </Link>
-        }
-      />
-    </section>
-  );
-}
+        return (
+            <section className="mx-auto max-w-4xl px-6 py-10">
+                <EmptyState
+                    icon={<BookOpen className="h-5 w-5" />}
+                    title="Course not found"
+                    description="This course does not exist, is unpublished, or the URL is incorrect."
+                    action={
+                        <Link
+                            to="/courses"
+                            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                        >
+                            Back to courses
+                        </Link>
+                    }
+                />
+            </section>
+        );
+    }
 
     if (status === "error") {
-  return (
-    <section className="mx-auto max-w-4xl px-6 py-10">
-      <ErrorState description={error} />
-    </section>
-  );
-}
+        return (
+            <section className="mx-auto max-w-4xl px-6 py-10">
+                <ErrorState description={error} />
+            </section>
+        );
+    }
 
     return (
         <section className="mx-auto max-w-4xl px-6 py-10">
@@ -94,6 +114,33 @@ export default function CourseDetailsPage() {
                 <p className="mt-4 text-lg leading-8 text-muted-foreground">
                     {course.description}
                 </p>
+
+                {totalLessons > 0 && (
+                    <div className="mt-8 rounded-2xl border border-border bg-card p-5">
+                        <div className="flex items-center justify-between gap-4">
+                            <div>
+                                <h2 className="font-semibold">
+                                    Course progress
+                                </h2>
+                                <p className="mt-1 text-sm text-muted-foreground">
+                                    {completedCount} of {totalLessons} lessons
+                                    completed
+                                </p>
+                            </div>
+
+                            <p className="text-sm font-medium text-primary">
+                                {progressPercentage}%
+                            </p>
+                        </div>
+
+                        <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+                            <div
+                                className="h-full rounded-full bg-primary transition-all"
+                                style={{ width: `${progressPercentage}%` }}
+                            />
+                        </div>
+                    </div>
+                )}
 
                 <div className="mt-8">
                     <LessonList courseSlug={course.slug} lessons={lessons} />

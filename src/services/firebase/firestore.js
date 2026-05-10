@@ -223,3 +223,81 @@ export const deleteLessonBookmark = async (bookmarkId) => {
 
   await deleteDoc(bookmarkRef);
 };
+
+/**
+ * PROGRESS
+ */
+export const getUserCourseProgress = async (userId, courseSlug) => {
+  const progressRef = collection(db, "progress");
+
+  const q = query(
+    progressRef,
+    where("userId", "==", userId),
+    where("courseSlug", "==", courseSlug)
+  );
+
+  const snap = await getDocs(q);
+
+  return snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+};
+
+export const getLessonProgress = async (userId, lessonId) => {
+  const progressRef = collection(db, "progress");
+
+  const q = query(
+    progressRef,
+    where("userId", "==", userId),
+    where("lessonId", "==", lessonId)
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) return null;
+
+  const progressDoc = snap.docs[0];
+
+  return {
+    id: progressDoc.id,
+    ...progressDoc.data(),
+  };
+};
+
+export const markLessonComplete = async ({
+  userId,
+  lessonId,
+  courseSlug,
+  lessonSlug,
+}) => {
+  const existingProgress = await getLessonProgress(userId, lessonId);
+
+  if (existingProgress) {
+    return existingProgress;
+  }
+
+  const progressRef = collection(db, "progress");
+
+  const docRef = await addDoc(progressRef, {
+    userId,
+    lessonId,
+    courseSlug,
+    lessonSlug,
+    completedAt: new Date(),
+  });
+
+  return {
+    id: docRef.id,
+    userId,
+    lessonId,
+    courseSlug,
+    lessonSlug,
+  };
+};
+
+export const unmarkLessonComplete = async (progressId) => {
+  const progressDocRef = doc(db, "progress", progressId);
+
+  await deleteDoc(progressDocRef);
+};

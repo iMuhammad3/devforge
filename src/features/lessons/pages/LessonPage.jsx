@@ -7,9 +7,15 @@ import LessonSidebar from "../components/LessonSidebar";
 import BookmarkButton from "@/features/bookmarks/components/BookmarkButton";
 import { EmptyState, ErrorState, LoadingState } from "@/shared/components/feedback";
 import { BookOpen } from "lucide-react";
+import { fetchUserCourseProgress } from "@/features/progress/api/progressApi";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { CompleteLessonButton } from "@/features/progress";
 
 export default function LessonPage() {
     const { courseSlug, lessonSlug } = useParams();
+
+    const user = useAuthStore((state) => state.user);
+    const [courseProgress, setCourseProgress] = useState([]);
 
     const [lesson, setLesson] = useState(null);
     const [lessons, setLessons] = useState([]);
@@ -22,10 +28,11 @@ export default function LessonPage() {
                 setStatus("loading");
                 setError("");
 
-                const [lessonData, lessonsData] = await Promise.all([
+                const [lessonData, lessonsData, progressData] = await Promise.all([
                     fetchLessonBySlug(courseSlug, lessonSlug),
                     fetchLessonsByCourseSlug(courseSlug),
-                ]);
+                    user?.uid ? fetchUserCourseProgress(user.uid, courseSlug) : [],
+                    ]);
 
                 if (!lessonData) {
                     setStatus("not-found");
@@ -34,6 +41,7 @@ export default function LessonPage() {
 
                 setLesson(lessonData);
                 setLessons(lessonsData);
+                setCourseProgress(progressData);
                 setStatus("success");
             } catch (err) {
                 console.error(err);
@@ -43,7 +51,26 @@ export default function LessonPage() {
         };
 
         loadLessonData();
-    }, [courseSlug, lessonSlug]);
+    }, [courseSlug, lessonSlug, user?.uid]);
+
+    const completedLessonIds = useMemo(() => {
+        return courseProgress.map((item) => item.lessonId);
+        }, [courseProgress]);
+
+    const handleProgressChange = (event) => {
+        if (event.type === "added") {
+            setCourseProgress((currentProgress) => [
+            ...currentProgress,
+            event.progress,
+            ]);
+        }
+
+        if (event.type === "removed") {
+            setCourseProgress((currentProgress) =>
+            currentProgress.filter((item) => item.lessonId !== event.lessonId)
+            );
+        }
+        };
 
     const currentIndex = useMemo(() => {
         return lessons.findIndex(item => item.slug === lessonSlug);
@@ -98,7 +125,8 @@ export default function LessonPage() {
                 courseSlug={courseSlug}
                 lessons={lessons}
                 currentLessonSlug={lessonSlug}
-            />
+                completedLessonIds={completedLessonIds}
+                />
 
             <article className="min-w-0 flex-1">
                 <div className="mx-auto max-w-3xl px-6 py-10">
@@ -124,8 +152,12 @@ export default function LessonPage() {
                             </p>
                         )}
 
-                        <div className="mt-6">
+                        <div className="mt-6 flex flex-wrap gap-3">
                             <BookmarkButton lesson={lesson} />
+                            <CompleteLessonButton
+                                lesson={lesson}
+                                onProgressChange={handleProgressChange}
+                            />
                         </div>
                     </header>
 

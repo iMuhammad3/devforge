@@ -19,6 +19,7 @@ import {
     validatePositiveNumber,
     validateRequired,
 } from "@/shared/utils/validation";
+import { useUnsavedChangesWarning } from "@/shared/hooks/useUnsavedChangesWarning";
 
 export default function AdminEditLessonPage() {
     const { lessonId } = useParams();
@@ -39,6 +40,9 @@ export default function AdminEditLessonPage() {
     const [status, setStatus] = useState("loading");
     const [error, setError] = useState("");
     const [errors, setErrors] = useState({});
+    const [isDirty, setIsDirty] = useState(false);
+
+    useUnsavedChangesWarning(isDirty && status !== "saving");
 
     useEffect(() => {
         const loadLessonData = async () => {
@@ -133,6 +137,8 @@ export default function AdminEditLessonPage() {
     const handleChange = event => {
         const { name, value } = event.target;
 
+        setIsDirty(true);
+
         setErrors(currentErrors => ({
             ...currentErrors,
             [name]: "",
@@ -180,6 +186,7 @@ export default function AdminEditLessonPage() {
                 published: Boolean(formData.published),
             });
 
+            setIsDirty(false);
             navigate("/admin/lessons");
         } catch (err) {
             console.error(err);
@@ -245,6 +252,11 @@ export default function AdminEditLessonPage() {
             <div className="mb-5">
                 <FormMessage type="error">{error}</FormMessage>
             </div>
+            {isDirty && (
+                <div className="mb-5 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+                    You have unsaved changes.
+                </div>
+            )}
 
             <LessonForm
                 formData={formData}

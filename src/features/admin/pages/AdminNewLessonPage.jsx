@@ -19,6 +19,7 @@ import {
     validatePositiveNumber,
     validateRequired,
 } from "@/shared/utils/validation";
+import { useUnsavedChangesWarning } from "@/shared/hooks/useUnsavedChangesWarning";
 
 const initialFormData = {
     courseId: "",
@@ -38,6 +39,9 @@ export default function AdminNewLessonPage() {
     const [status, setStatus] = useState("loading");
     const [error, setError] = useState("");
     const [errors, setErrors] = useState({});
+    const [isDirty, setIsDirty] = useState(false);
+
+    useUnsavedChangesWarning(isDirty && status !== "saving");
 
     useEffect(() => {
         const loadCourses = async () => {
@@ -118,6 +122,8 @@ export default function AdminNewLessonPage() {
     const handleChange = event => {
         const { name, value } = event.target;
 
+        setIsDirty(true);
+
         setErrors(currentErrors => ({
             ...currentErrors,
             [name]: "",
@@ -179,6 +185,7 @@ export default function AdminNewLessonPage() {
                 archived: false,
             });
 
+            setIsDirty(false);
             navigate("/admin/lessons");
         } catch (err) {
             console.error(err);
@@ -226,6 +233,11 @@ export default function AdminNewLessonPage() {
             <div className="mb-5">
                 <FormMessage type="error">{error}</FormMessage>
             </div>
+            {isDirty && (
+                <div className="mb-5 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
+                    You have unsaved changes.
+                </div>
+            )}
 
             {courses.length === 0 ? (
                 <EmptyState

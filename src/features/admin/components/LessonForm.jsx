@@ -10,6 +10,7 @@ import {
 } from "@/shared/components/forms";
 
 import MarkdownRenderer from "@/features/lessons/components/MarkdownRenderer";
+import { getReadingTime } from "@/shared/utils/readingTime";
 
 const LESSON_TEMPLATE = `# Lesson Title
 
@@ -75,6 +76,7 @@ export default function LessonForm({
     submitLabel = "Save lesson",
 }) {
     const [contentMode, setContentMode] = useState("write");
+    const readingTime = getReadingTime(formData.content);
 
     const courseOptions = courses.map(course => ({
         label: course.title,
@@ -237,11 +239,11 @@ Write your lesson content here.
                             className="w-full resize-y rounded-lg border border-input bg-background px-3 py-3 font-mono text-sm leading-6 outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
                         />
                     ) : (
-                        <div className="min-h-[420px] rounded-lg border border-border bg-background p-5">
+                        <div className="min-h-105 rounded-lg border border-border bg-background p-5">
                             {formData.content.trim() ? (
                                 <MarkdownRenderer content={formData.content} />
                             ) : (
-                                <div className="flex min-h-[320px] items-center justify-center text-center">
+                                <div className="flex min-h-80 items-center justify-center text-center">
                                     <div>
                                         <p className="font-medium">
                                             Nothing to preview yet
@@ -256,16 +258,22 @@ Write your lesson content here.
                         </div>
                     )}
 
-                    {errors.content ? (
-                        <p className="mt-2 text-xs text-destructive">
-                            {errors.content}
+                    <div className="mt-2 flex flex-wrap items-center justify-between gap-2">
+                        {errors.content ? (
+                            <p className="text-xs text-destructive">
+                                {errors.content}
+                            </p>
+                        ) : (
+                            <p className="text-xs text-muted-foreground">
+                                You can use headings, lists, links, inline code,
+                                and fenced code blocks.
+                            </p>
+                        )}
+
+                        <p className="text-xs text-muted-foreground">
+                            {readingTime.wordCount} words · {readingTime.label}
                         </p>
-                    ) : (
-                        <p className="mt-2 text-xs text-muted-foreground">
-                            You can use headings, lists, links, inline code, and
-                            fenced code blocks.
-                        </p>
-                    )}
+                    </div>
                 </div>
 
                 <CheckboxInput

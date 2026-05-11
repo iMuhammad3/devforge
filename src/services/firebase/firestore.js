@@ -356,3 +356,59 @@ export const deleteCourse = async (courseId) => {
   const courseRef = doc(db, "courses", courseId);
   await deleteDoc(courseRef);
 };
+
+/**
+ * ADMIN LESSONS
+ */
+export const getAllLessonsForAdmin = async () => {
+  const snap = await getDocs(collection(db, "lessons"));
+
+  const lessons = snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  return lessons.sort((a, b) => {
+    if (a.courseSlug === b.courseSlug) {
+      return (a.order || 0) - (b.order || 0);
+    }
+
+    return a.courseSlug?.localeCompare(b.courseSlug || "") || 0;
+  });
+};
+
+export const createLesson = async (lessonData) => {
+  const lessonsRef = collection(db, "lessons");
+
+  const docRef = await addDoc(lessonsRef, {
+    ...lessonData,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  return {
+    id: docRef.id,
+    ...lessonData,
+  };
+};
+
+export const getLessonById = async (lessonId) => {
+  const lessonRef = doc(db, "lessons", lessonId);
+  const lessonSnap = await getDoc(lessonRef);
+
+  if (!lessonSnap.exists()) return null;
+
+  return {
+    id: lessonSnap.id,
+    ...lessonSnap.data(),
+  };
+};
+
+export const updateLesson = async (lessonId, lessonData) => {
+  const lessonRef = doc(db, "lessons", lessonId);
+
+  await updateDoc(lessonRef, {
+    ...lessonData,
+    updatedAt: new Date(),
+  });
+};

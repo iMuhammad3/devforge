@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
     Archive,
@@ -8,6 +8,8 @@ import {
     EyeOff,
     Plus,
     RotateCcw,
+    Search,
+    X,
 } from "lucide-react";
 
 import { fetchAdminLessons, updateAdminLesson } from "../api/adminLessonsApi";
@@ -22,6 +24,9 @@ export default function AdminLessonsPage() {
     const [status, setStatus] = useState("loading");
     const [error, setError] = useState("");
     const [showArchived, setShowArchived] = useState(false);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [courseFilter, setCourseFilter] = useState("all");
 
     useEffect(() => {
         const loadLessons = async () => {
@@ -56,11 +61,74 @@ export default function AdminLessonsPage() {
         );
     };
 
-    const visibleLessons = showArchived
-        ? lessons
-        : lessons.filter(lesson => !lesson.archived);
-
     const archivedCount = lessons.filter(lesson => lesson.archived).length;
+
+    const courseOptions = useMemo(() => {
+        const courseMap = new Map();
+
+        lessons.forEach(lesson => {
+            if (!lesson.courseSlug) return;
+
+            courseMap.set(
+                lesson.courseSlug,
+                lesson.courseTitle || lesson.courseSlug,
+            );
+        });
+
+        return Array.from(courseMap.entries()).map(([slug, title]) => ({
+            slug,
+            title,
+        }));
+    }, [lessons]);
+
+    const visibleLessons = useMemo(() => {
+        const query = searchQuery.trim().toLowerCase();
+
+        return lessons.filter(lesson => {
+            const matchesArchive = showArchived ? true : !lesson.archived;
+
+            const matchesSearch =
+                !query ||
+                lesson.title?.toLowerCase().includes(query) ||
+                lesson.description?.toLowerCase().includes(query) ||
+                lesson.slug?.toLowerCase().includes(query) ||
+                lesson.courseSlug?.toLowerCase().includes(query) ||
+                lesson.courseTitle?.toLowerCase().includes(query);
+
+            const matchesStatus =
+                statusFilter === "all" ||
+                (statusFilter === "published" &&
+                    lesson.published &&
+                    !lesson.archived) ||
+                (statusFilter === "draft" &&
+                    !lesson.published &&
+                    !lesson.archived) ||
+                (statusFilter === "archived" && lesson.archived);
+
+            const matchesCourse =
+                courseFilter === "all" || lesson.courseSlug === courseFilter;
+
+            return (
+                matchesArchive &&
+                matchesSearch &&
+                matchesStatus &&
+                matchesCourse
+            );
+        });
+    }, [lessons, searchQuery, statusFilter, courseFilter, showArchived]);
+
+    const hasActiveFilters =
+        searchQuery ||
+        statusFilter !== "all" ||
+        courseFilter !== "all" ||
+        showArchived;
+
+    const clearFilters = () => {
+        setSearchQuery("");
+        setStatusFilter("all");
+        setCourseFilter("all");
+        setShowArchived(false);
+    };
 
     if (status === "loading") {
         return (
@@ -94,15 +162,6 @@ export default function AdminLessonsPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                    <button
-                        type="button"
-                        onClick={() => setShowArchived(current => !current)}
-                        className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-medium transition hover:bg-muted"
-                    >
-                        {showArchived
-                            ? "Hide archived"
-                            : `Show archived (${archivedCount})`}
-                    </button>
 
                     <Link
                         to="/admin/lessons/new"
@@ -111,6 +170,82 @@ export default function AdminLessonsPage() {
                         <Plus className="h-4 w-4" />
                         New lesson
                     </Link>
+                </div>
+            </div>
+
+            <div className="mb-6 rounded-2xl border border-border bg-card p-4">
+                <div className="grid gap-4 xl:grid-cols-[1fr_auto_auto_auto]">
+                    <div className="relative">
+                        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
+                        <input
+                            type="text"
+                            value={searchQuery}
+                            onChange={event =>
+                                setSearchQuery(event.target.value)
+                            }
+                            placeholder="Search lessons..."
+                            className="h-11 w-full rounded-lg border border-input bg-background pl-10 pr-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                        />
+                    </div>
+
+                    <select
+                        value={courseFilter}
+                        onChange={event => setCourseFilter(event.target.value)}
+                        className="h-11 rounded-lg border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    >
+                        <option value="all">All courses</option>
+                        {courseOptions.map(course => (
+                            <option key={course.slug} value={course.slug}>
+                                {course.title}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        value={statusFilter}
+                        onChange={event => setStatusFilter(event.target.value)}
+                        className="h-11 rounded-lg border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
+                    >
+                        <option value="all">All statuses</option>
+                        <option value="published">Published</option>
+                        <option value="draft">Draft</option>
+                        <option value="archived">Archived</option>
+                    </select>
+
+                    <button
+                        type="button"
+                        onClick={clearFilters}
+                        disabled={!hasActiveFilters}
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-lg border border-border bg-background px-4 text-sm font-medium transition hover:bg-muted disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                        <X className="h-4 w-4" />
+                        Clear
+                    </button>
+                </div>
+
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-muted-foreground">
+                    <p>
+                        Showing{" "}
+                        <span className="font-medium text-foreground">
+                            {visibleLessons.length}
+                        </span>{" "}
+                        of{" "}
+                        <span className="font-medium text-foreground">
+                            {lessons.length}
+                        </span>{" "}
+                        lessons
+                    </p>
+
+                    <button
+                        type="button"
+                        onClick={() => setShowArchived(current => !current)}
+                        className="text-primary hover:underline"
+                    >
+                        {showArchived
+                            ? "Hide archived"
+                            : `Show archived (${archivedCount})`}
+                    </button>
                 </div>
             </div>
 

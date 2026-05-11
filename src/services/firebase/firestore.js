@@ -341,6 +341,23 @@ export const getCourseById = async courseId => {
     };
 };
 
+export const getCourseBySlugForAdmin = async (slug) => {
+  const coursesRef = collection(db, "courses");
+
+  const q = query(coursesRef, where("slug", "==", slug));
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) return null;
+
+  const courseDoc = snap.docs[0];
+
+  return {
+    id: courseDoc.id,
+    ...courseDoc.data(),
+  };
+};
+
 export const createCourse = async courseData => {
     const coursesRef = collection(db, "courses");
 
@@ -415,6 +432,27 @@ export const getLessonById = async lessonId => {
         id: lessonSnap.id,
         ...lessonSnap.data(),
     };
+};
+
+export const getLessonByCourseAndSlugForAdmin = async (courseId, slug) => {
+  const lessonsRef = collection(db, "lessons");
+
+  const q = query(
+    lessonsRef,
+    where("courseId", "==", courseId),
+    where("slug", "==", slug)
+  );
+
+  const snap = await getDocs(q);
+
+  if (snap.empty) return null;
+
+  const lessonDoc = snap.docs[0];
+
+  return {
+    id: lessonDoc.id,
+    ...lessonDoc.data(),
+  };
 };
 
 export const updateLesson = async (lessonId, lessonData) => {

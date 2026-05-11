@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import LessonForm from "../components/LessonForm";
-import { createAdminLesson } from "../api/adminLessonsApi";
+import {
+    createAdminLesson,
+    fetchAdminLessonByCourseAndSlug,
+} from "../api/adminLessonsApi";
 import { fetchAdminCourses } from "../api/adminCoursesApi";
 import { FormMessage } from "@/shared/components/forms";
 import {
@@ -11,6 +14,11 @@ import {
     LoadingState,
 } from "@/shared/components/feedback";
 import { slugify } from "@/shared/utils/slugify";
+import {
+    isValidSlug,
+    validatePositiveNumber,
+    validateRequired,
+} from "@/shared/utils/validation";
 
 const initialFormData = {
     courseId: "",
@@ -29,6 +37,7 @@ export default function AdminNewLessonPage() {
     const [formData, setFormData] = useState(initialFormData);
     const [status, setStatus] = useState("loading");
     const [error, setError] = useState("");
+    const [errors, setErrors] = useState({});
 
     useEffect(() => {
         const loadCourses = async () => {
@@ -55,8 +64,64 @@ export default function AdminNewLessonPage() {
         loadCourses();
     }, []);
 
+    const validateForm = async () => {
+        const nextErrors = {};
+
+        const courseId = formData.courseId;
+        const title = formData.title.trim();
+        const slug = formData.slug.trim();
+        const description = formData.description.trim();
+        const content = formData.content.trim();
+
+        if (!validateRequired(courseId)) {
+            nextErrors.courseId = "Please select a course.";
+        }
+
+        if (!validateRequired(title)) {
+            nextErrors.title = "Lesson title is required.";
+        }
+
+        if (!validateRequired(slug)) {
+            nextErrors.slug = "Slug is required.";
+        } else if (!isValidSlug(slug)) {
+            nextErrors.slug =
+                "Slug can only contain lowercase letters, numbers, and hyphens.";
+        } else if (courseId) {
+            const existingLesson = await fetchAdminLessonByCourseAndSlug(
+                courseId,
+                slug,
+            );
+
+            if (existingLesson) {
+                nextErrors.slug =
+                    "A lesson with this slug already exists in this course.";
+            }
+        }
+
+        if (!validateRequired(description)) {
+            nextErrors.description = "Description is required.";
+        }
+
+        if (!validateRequired(content)) {
+            nextErrors.content = "Lesson content is required.";
+        }
+
+        if (!validatePositiveNumber(formData.order)) {
+            nextErrors.order = "Order must be a number greater than 0.";
+        }
+
+        setErrors(nextErrors);
+
+        return Object.keys(nextErrors).length === 0;
+    };
+
     const handleChange = event => {
         const { name, value } = event.target;
+
+        setErrors(currentErrors => ({
+            ...currentErrors,
+            [name]: "",
+        }));
 
         setFormData(currentData => {
             const nextData = {
@@ -66,6 +131,11 @@ export default function AdminNewLessonPage() {
 
             if (name === "title") {
                 nextData.slug = slugify(value);
+
+                setErrors(currentErrors => ({
+                    ...currentErrors,
+                    slug: "",
+                }));
             }
 
             return nextData;
@@ -78,6 +148,13 @@ export default function AdminNewLessonPage() {
         try {
             setStatus("saving");
             setError("");
+
+            const isValid = await validateForm();
+
+            if (!isValid) {
+                setStatus("idle");
+                return;
+            }
 
             const selectedCourse = courses.find(
                 course => course.id === formData.courseId,
@@ -166,6 +243,7 @@ export default function AdminNewLessonPage() {
             ) : (
                 <LessonForm
                     formData={formData}
+                    errors={errors}
                     courses={courses}
                     onChange={handleChange}
                     onSubmit={handleSubmit}

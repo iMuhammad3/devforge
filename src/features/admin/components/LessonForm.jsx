@@ -67,6 +67,7 @@ In this lesson, you learned:
 
 export default function LessonForm({
     formData,
+    errors = {},
     courses = [],
     onChange,
     onSubmit,
@@ -121,6 +122,7 @@ export default function LessonForm({
                     onChange={onChange}
                     options={courseOptions}
                     helpText="Choose the course this lesson belongs to."
+                    error={errors.courseId}
                     required
                 />
 
@@ -130,6 +132,7 @@ export default function LessonForm({
                     value={formData.title}
                     onChange={onChange}
                     placeholder="What is HTML?"
+                    error={errors.title}
                     required
                 />
 
@@ -140,6 +143,7 @@ export default function LessonForm({
                     onChange={onChange}
                     placeholder="what-is-html"
                     helpText="This controls the lesson URL."
+                    error={errors.slug}
                     required
                 />
 
@@ -150,6 +154,7 @@ export default function LessonForm({
                     onChange={onChange}
                     placeholder="Briefly explain what this lesson teaches."
                     rows={3}
+                    error={errors.description}
                     required
                 />
 
@@ -161,6 +166,7 @@ export default function LessonForm({
                     onChange={onChange}
                     placeholder="1"
                     helpText="Lower numbers appear first in the course."
+                    error={errors.order}
                     required
                 />
 
@@ -250,10 +256,16 @@ Write your lesson content here.
                         </div>
                     )}
 
-                    <p className="mt-2 text-xs text-muted-foreground">
-                        You can use headings, lists, links, inline code, and
-                        fenced code blocks.
-                    </p>
+                    {errors.content ? (
+                        <p className="mt-2 text-xs text-destructive">
+                            {errors.content}
+                        </p>
+                    ) : (
+                        <p className="mt-2 text-xs text-muted-foreground">
+                            You can use headings, lists, links, inline code, and
+                            fenced code blocks.
+                        </p>
+                    )}
                 </div>
 
                 <CheckboxInput

@@ -22,6 +22,7 @@ const LEVEL_OPTIONS = [
 
 export default function CourseForm({
   formData,
+  errors = {},
   onChange,
   onSubmit,
   isSubmitting = false,
@@ -48,6 +49,7 @@ export default function CourseForm({
           value={formData.title}
           onChange={onChange}
           placeholder="HTML Foundations"
+          error={errors.title}
           required
         />
 
@@ -58,6 +60,7 @@ export default function CourseForm({
           onChange={onChange}
           placeholder="html-foundations"
           helpText="This controls the course URL. Keep it lowercase and readable."
+          error={errors.slug}
           required
         />
 
@@ -68,6 +71,7 @@ export default function CourseForm({
           onChange={onChange}
           placeholder="Briefly explain what students will learn."
           rows={4}
+          error={errors.description}
           required
         />
 
@@ -99,6 +103,7 @@ export default function CourseForm({
           onChange={onChange}
           placeholder="1"
           helpText="Lower numbers appear first."
+          error={errors.order}
           required
         />
 

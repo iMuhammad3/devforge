@@ -3,6 +3,7 @@ import {
   deleteCourse,
   getAllCoursesForAdmin,
   getCourseById,
+  getCourseBySlugForAdmin,
   updateCourse,
 } from "@/services/firebase/firestore";
 
@@ -12,6 +13,10 @@ export const fetchAdminCourses = async () => {
 
 export const fetchAdminCourseById = async (courseId) => {
   return getCourseById(courseId);
+};
+
+export const fetchAdminCourseBySlug = async (slug) => {
+  return getCourseBySlugForAdmin(slug);
 };
 
 export const createAdminCourse = async (courseData) => {

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Edit, ExternalLink, Eye, EyeOff, Plus } from "lucide-react";
 
-import { fetchAdminCourses } from "../api/adminCoursesApi";
+import { fetchAdminCourses, updateAdminCourse } from "../api/adminCoursesApi";
 import {
     EmptyState,
     ErrorState,
@@ -13,6 +13,19 @@ export default function AdminCoursesPage() {
     const [courses, setCourses] = useState([]);
     const [status, setStatus] = useState("loading");
     const [error, setError] = useState("");
+
+    const updateCourseInState = (courseId, updatedFields) => {
+        setCourses(currentCourses =>
+            currentCourses.map(course =>
+                course.id === courseId
+                    ? {
+                          ...course,
+                          ...updatedFields,
+                      }
+                    : course,
+            ),
+        );
+    };
 
     useEffect(() => {
         const loadCourses = async () => {
@@ -98,7 +111,11 @@ export default function AdminCoursesPage() {
 
                     <div className="divide-y divide-border">
                         {courses.map(course => (
-                            <CourseRow key={course.id} course={course} />
+                            <CourseRow
+                                key={course.id}
+                                course={course}
+                                onCourseUpdate={updateCourseInState}
+                            />
                         ))}
                     </div>
                 </div>
@@ -107,62 +124,94 @@ export default function AdminCoursesPage() {
     );
 }
 
-function CourseRow({ course }) {
-    return (
-        <div className="grid gap-4 px-5 py-4 md:grid-cols-[1fr_120px_120px_100px] md:items-center">
-            <div>
-                <div className="flex flex-wrap items-center gap-2">
-                    <h2 className="font-medium">{course.title}</h2>
+function CourseRow({ course, onCourseUpdate }) {
+  const [isUpdating, setIsUpdating] = useState(false);
 
-                    {course.category && (
-                        <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
-                            {course.category}
-                        </span>
-                    )}
-                </div>
+  const handleTogglePublished = async () => {
+    try {
+      setIsUpdating(true);
 
-                <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
-                    {course.description}
-                </p>
+      const nextPublishedValue = !course.published;
 
-                <p className="mt-2 text-xs text-muted-foreground">
-                    /{course.slug}
-                </p>
-            </div>
+      await updateAdminCourse(course.id, {
+        published: nextPublishedValue,
+      });
 
-            <div className="text-sm text-muted-foreground">{course.level}</div>
+      onCourseUpdate(course.id, {
+        published: nextPublishedValue,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to update course visibility.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
 
-            <div>
-                {course.published ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                        <Eye className="h-3 w-3" />
-                        Published
-                    </span>
-                ) : (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">
-                        <EyeOff className="h-3 w-3" />
-                        Draft
-                    </span>
-                )}
-            </div>
+  return (
+    <div className="grid gap-4 px-5 py-4 md:grid-cols-[1fr_120px_160px_160px] md:items-center">
+      <div>
+        <div className="flex flex-wrap items-center gap-2">
+          <h2 className="font-medium">{course.title}</h2>
 
-            <div className="flex justify-end gap-2">
-                <Link
-                    to={`/courses/${course.slug}`}
-                    className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm transition hover:bg-muted"
-                    title="View public course"
-                >
-                    <ExternalLink className="h-4 w-4" />
-                </Link>
-
-                <Link
-                    to={`/admin/courses/${course.id}/edit`}
-                    className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm transition hover:bg-muted"
-                >
-                    <Edit className="h-4 w-4" />
-                    Edit
-                </Link>
-            </div>
+          {course.category && (
+            <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+              {course.category}
+            </span>
+          )}
         </div>
-    );
+
+        <p className="mt-1 line-clamp-2 text-sm text-muted-foreground">
+          {course.description}
+        </p>
+
+        <p className="mt-2 text-xs text-muted-foreground">/{course.slug}</p>
+      </div>
+
+      <div className="text-sm text-muted-foreground">{course.level}</div>
+
+      <div>
+        <button
+          type="button"
+          onClick={handleTogglePublished}
+          disabled={isUpdating}
+          className={`inline-flex h-9 items-center gap-2 rounded-lg border px-3 text-xs font-medium transition disabled:cursor-not-allowed disabled:opacity-60 ${
+            course.published
+              ? "border-primary/30 bg-primary/10 text-primary hover:bg-primary/15"
+              : "border-border bg-muted text-muted-foreground hover:bg-muted/80"
+          }`}
+        >
+          {course.published ? (
+            <>
+              <Eye className="h-3.5 w-3.5" />
+              Published
+            </>
+          ) : (
+            <>
+              <EyeOff className="h-3.5 w-3.5" />
+              Draft
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <Link
+          to={`/courses/${course.slug}`}
+          className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm transition hover:bg-muted"
+          title="View public course"
+        >
+          <ExternalLink className="h-4 w-4" />
+        </Link>
+
+        <Link
+          to={`/admin/courses/${course.id}/edit`}
+          className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm transition hover:bg-muted"
+        >
+          <Edit className="h-4 w-4" />
+          Edit
+        </Link>
+      </div>
+    </div>
+  );
 }

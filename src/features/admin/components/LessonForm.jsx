@@ -1,3 +1,6 @@
+import { useState } from "react";
+import { Eye, Pencil } from "lucide-react";
+
 import {
   CheckboxInput,
   SelectInput,
@@ -5,6 +8,8 @@ import {
   TextareaInput,
   TextInput,
 } from "@/shared/components/forms";
+
+import MarkdownRenderer from "@/features/lessons/components/MarkdownRenderer";
 
 export default function LessonForm({
   formData,
@@ -14,6 +19,8 @@ export default function LessonForm({
   isSubmitting = false,
   submitLabel = "Save lesson",
 }) {
+  const [contentMode, setContentMode] = useState("write");
+
   const courseOptions = courses.map((course) => ({
     label: course.title,
     value: course.id,
@@ -84,12 +91,50 @@ export default function LessonForm({
           required
         />
 
-        <TextareaInput
-          label="Markdown content"
-          name="content"
-          value={formData.content}
-          onChange={onChange}
-          placeholder={`# Lesson title
+        <div>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <label className="block text-sm font-medium">
+              Markdown content <span className="text-destructive">*</span>
+            </label>
+
+            <div className="inline-flex rounded-lg border border-border bg-background p-1">
+              <button
+                type="button"
+                onClick={() => setContentMode("write")}
+                className={`inline-flex h-8 items-center gap-2 rounded-md px-3 text-xs font-medium transition ${
+                  contentMode === "write"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <Pencil className="h-3.5 w-3.5" />
+                Write
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setContentMode("preview")}
+                className={`inline-flex h-8 items-center gap-2 rounded-md px-3 text-xs font-medium transition ${
+                  contentMode === "preview"
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <Eye className="h-3.5 w-3.5" />
+                Preview
+              </button>
+            </div>
+          </div>
+
+          {contentMode === "write" ? (
+            <textarea
+              id="content"
+              name="content"
+              value={formData.content}
+              onChange={onChange}
+              rows={18}
+              required
+              placeholder={`# Lesson title
 
 Write your lesson content here.
 
@@ -99,9 +144,31 @@ Write your lesson content here.
 <h1>Hello World</h1>
 \`\`\`
 `}
-          rows={16}
-          required
-        />
+              className="w-full resize-y rounded-lg border border-input bg-background px-3 py-3 font-mono text-sm leading-6 outline-none transition placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+            />
+          ) : (
+            <div className="min-h-[420px] rounded-lg border border-border bg-background p-5">
+              {formData.content.trim() ? (
+                <MarkdownRenderer content={formData.content} />
+              ) : (
+                <div className="flex min-h-[320px] items-center justify-center text-center">
+                  <div>
+                    <p className="font-medium">Nothing to preview yet</p>
+                    <p className="mt-2 text-sm text-muted-foreground">
+                      Write some markdown content first, then switch back to
+                      preview.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          <p className="mt-2 text-xs text-muted-foreground">
+            You can use headings, lists, links, inline code, and fenced code
+            blocks.
+          </p>
+        </div>
 
         <CheckboxInput
           label="Publish lesson"

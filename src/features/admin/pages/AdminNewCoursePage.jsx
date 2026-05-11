@@ -55,6 +55,7 @@ export default function AdminNewCoursePage() {
         level: formData.level,
         order: Number(formData.order),
         published: Boolean(formData.published),
+        archived: false,
       });
 
       navigate("/admin/courses");

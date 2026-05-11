@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Edit, ExternalLink, Eye, EyeOff, Plus } from "lucide-react";
+import { Archive, Edit, ExternalLink, Eye, EyeOff, Plus, RotateCcw } from "lucide-react";
 
 import { fetchAdminCourses, updateAdminCourse } from "../api/adminCoursesApi";
 import {
@@ -13,6 +13,7 @@ export default function AdminCoursesPage() {
     const [courses, setCourses] = useState([]);
     const [status, setStatus] = useState("loading");
     const [error, setError] = useState("");
+    const [showArchived, setShowArchived] = useState(false);
 
     const updateCourseInState = (courseId, updatedFields) => {
         setCourses(currentCourses =>
@@ -47,6 +48,12 @@ export default function AdminCoursesPage() {
         loadCourses();
     }, []);
 
+    const visibleCourses = showArchived
+        ? courses
+        : courses.filter(course => !course.archived);
+
+    const archivedCount = courses.filter(course => course.archived).length;
+
     if (status === "loading") {
         return (
             <LoadingState
@@ -77,16 +84,28 @@ export default function AdminCoursesPage() {
                     </p>
                 </div>
 
-                <Link
-                    to="/admin/courses/new"
-                    className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-                >
-                    <Plus className="h-4 w-4" />
-                    New course
-                </Link>
+                <div className="flex flex-wrap gap-3">
+                    <button
+                        type="button"
+                        onClick={() => setShowArchived(current => !current)}
+                        className="inline-flex h-10 items-center justify-center rounded-lg border border-border bg-card px-4 text-sm font-medium transition hover:bg-muted"
+                    >
+                        {showArchived
+                            ? "Hide archived"
+                            : `Show archived (${archivedCount})`}
+                    </button>
+
+                    <Link
+                        to="/admin/courses/new"
+                        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                    >
+                        <Plus className="h-4 w-4" />
+                        New course
+                    </Link>
+                </div>
             </div>
 
-            {courses.length === 0 ? (
+            {visibleCourses.length === 0 ? (
                 <EmptyState
                     title="No courses yet"
                     description="Create your first course from the admin dashboard."
@@ -102,7 +121,7 @@ export default function AdminCoursesPage() {
                 />
             ) : (
                 <div className="overflow-hidden rounded-2xl border border-border bg-card">
-                    <div className="grid grid-cols-[1fr_120px_120px_100px] gap-4 border-b border-border bg-muted/40 px-5 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground max-md:hidden">
+                    <div className="grid grid-cols-[1fr_120px_160px_190px] gap-4 border-b border-border bg-muted/40 px-5 py-3 text-xs font-medium uppercase tracking-wide text-muted-foreground max-md:hidden">
                         <span>Course</span>
                         <span>Level</span>
                         <span>Status</span>
@@ -110,7 +129,7 @@ export default function AdminCoursesPage() {
                     </div>
 
                     <div className="divide-y divide-border">
-                        {courses.map(course => (
+                        {visibleCourses.map(course => (
                             <CourseRow
                                 key={course.id}
                                 course={course}
@@ -128,6 +147,11 @@ function CourseRow({ course, onCourseUpdate }) {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const handleTogglePublished = async () => {
+    if (course.archived) {
+      alert("Restore this course before publishing it.");
+      return;
+    }
+
     try {
       setIsUpdating(true);
 
@@ -148,8 +172,62 @@ function CourseRow({ course, onCourseUpdate }) {
     }
   };
 
+  const handleArchiveCourse = async () => {
+    const confirmed = window.confirm(
+      "Archive this course? It will be hidden from public pages and the normal admin list."
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setIsUpdating(true);
+
+      await updateAdminCourse(course.id, {
+        archived: true,
+        published: false,
+      });
+
+      onCourseUpdate(course.id, {
+        archived: true,
+        published: false,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to archive course.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const handleRestoreCourse = async () => {
+    const confirmed = window.confirm(
+      "Restore this course? It will return to the normal admin list as a draft."
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setIsUpdating(true);
+
+      await updateAdminCourse(course.id, {
+        archived: false,
+        published: false,
+      });
+
+      onCourseUpdate(course.id, {
+        archived: false,
+        published: false,
+      });
+    } catch (err) {
+      console.error(err);
+      alert("Failed to restore course.");
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
   return (
-    <div className="grid gap-4 px-5 py-4 md:grid-cols-[1fr_120px_160px_160px] md:items-center">
+    <div className="grid gap-4 px-5 py-4 md:grid-cols-[1fr_120px_160px_190px] md:items-center">
       <div>
         <div className="flex flex-wrap items-center gap-2">
           <h2 className="font-medium">{course.title}</h2>
@@ -157,6 +235,12 @@ function CourseRow({ course, onCourseUpdate }) {
           {course.category && (
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
               {course.category}
+            </span>
+          )}
+
+          {course.archived && (
+            <span className="rounded-full border border-border bg-background px-2 py-0.5 text-xs font-medium text-muted-foreground">
+              Archived
             </span>
           )}
         </div>
@@ -196,13 +280,15 @@ function CourseRow({ course, onCourseUpdate }) {
       </div>
 
       <div className="flex justify-end gap-2">
-        <Link
-          to={`/courses/${course.slug}`}
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm transition hover:bg-muted"
-          title="View public course"
-        >
-          <ExternalLink className="h-4 w-4" />
-        </Link>
+        {!course.archived && (
+          <Link
+            to={`/courses/${course.slug}`}
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm transition hover:bg-muted"
+            title="View public course"
+          >
+            <ExternalLink className="h-4 w-4" />
+          </Link>
+        )}
 
         <Link
           to={`/admin/courses/${course.id}/edit`}
@@ -211,6 +297,29 @@ function CourseRow({ course, onCourseUpdate }) {
           <Edit className="h-4 w-4" />
           Edit
         </Link>
+
+        {course.archived ? (
+          <button
+            type="button"
+            onClick={handleRestoreCourse}
+            disabled={isUpdating}
+            className="inline-flex h-9 items-center justify-center gap-2 rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            title="Restore course"
+          >
+            <RotateCcw className="h-4 w-4" />
+            Restore
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={handleArchiveCourse}
+            disabled={isUpdating}
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-border bg-background px-3 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground disabled:cursor-not-allowed disabled:opacity-60"
+            title="Archive course"
+          >
+            <Archive className="h-4 w-4" />
+          </button>
+        )}
       </div>
     </div>
   );

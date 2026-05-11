@@ -301,3 +301,46 @@ export const unmarkLessonComplete = async (progressId) => {
 
   await deleteDoc(progressDocRef);
 };
+
+/**
+ * ADMIN COURSES
+ */
+export const getAllCoursesForAdmin = async () => {
+  const snap = await getDocs(collection(db, "courses"));
+
+  const courses = snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  return courses.sort((a, b) => (a.order || 0) - (b.order || 0));
+};
+
+export const createCourse = async (courseData) => {
+  const coursesRef = collection(db, "courses");
+
+  const docRef = await addDoc(coursesRef, {
+    ...courseData,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  });
+
+  return {
+    id: docRef.id,
+    ...courseData,
+  };
+};
+
+export const updateCourse = async (courseId, courseData) => {
+  const courseRef = doc(db, "courses", courseId);
+
+  await updateDoc(courseRef, {
+    ...courseData,
+    updatedAt: new Date(),
+  });
+};
+
+export const deleteCourse = async (courseId) => {
+  const courseRef = doc(db, "courses", courseId);
+  await deleteDoc(courseRef);
+};

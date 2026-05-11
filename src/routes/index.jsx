@@ -21,6 +21,7 @@ import {
     AdminCoursesPage,
     AdminDashboardPage,
     AdminLessonsPage,
+    AdminNewCoursePage,
 } from "@/features/admin";
 
 export const router = createBrowserRouter([
@@ -67,6 +68,7 @@ export const router = createBrowserRouter([
             { path: "/admin", element: <AdminDashboardPage /> },
             { path: "/admin/courses", element: <AdminCoursesPage /> },
             { path: "/admin/lessons", element: <AdminLessonsPage /> },
+            { path: "/admin/courses/new", element: <AdminNewCoursePage /> },
         ],
     },
 

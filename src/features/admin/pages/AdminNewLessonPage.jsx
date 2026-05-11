@@ -5,7 +5,11 @@ import LessonForm from "../components/LessonForm";
 import { createAdminLesson } from "../api/adminLessonsApi";
 import { fetchAdminCourses } from "../api/adminCoursesApi";
 import { FormMessage } from "@/shared/components/forms";
-import { EmptyState, ErrorState, LoadingState } from "@/shared/components/feedback";
+import {
+    EmptyState,
+    ErrorState,
+    LoadingState,
+} from "@/shared/components/feedback";
 import { slugify } from "@/shared/utils/slugify";
 
 const initialFormData = {
@@ -95,6 +99,7 @@ export default function AdminNewLessonPage() {
                 content: formData.content.trim(),
                 order: Number(formData.order),
                 published: Boolean(formData.published),
+                archived: false,
             });
 
             navigate("/admin/lessons");

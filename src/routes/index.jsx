@@ -15,44 +15,63 @@ import { SettingsPage } from "@/features/settings";
 import { ProfilePage } from "@/features/profile";
 import { BookmarksPage } from "@/features/bookmarks";
 import { NotFoundPage } from "@/features/errors";
+import AdminRoute from "./AdminRoute";
+import AdminLayout from "@/layouts/AdminLayout";
+import {
+    AdminCoursesPage,
+    AdminDashboardPage,
+    AdminLessonsPage,
+} from "@/features/admin";
 
 export const router = createBrowserRouter([
-  {
-    element: <PublicLayout />,
-    children: [
-      { path: "/", element: <HomePage /> },
-      { path: "/login", element: <Login /> },
-    ],
-  },
+    {
+        element: <PublicLayout />,
+        children: [
+            { path: "/", element: <HomePage /> },
+            { path: "/login", element: <Login /> },
+        ],
+    },
 
-  {
-    element: <LearningLayout />,
-    children: [
-      { path: "/courses", element: <CoursesPage /> },
-      { path: "/courses/:slug", element: <CourseDetailsPage /> },
-      {
-        path: "/courses/:courseSlug/lessons/:lessonSlug",
-        element: <LessonPage />,
-      },
-    ],
-  },
+    {
+        element: <LearningLayout />,
+        children: [
+            { path: "/courses", element: <CoursesPage /> },
+            { path: "/courses/:slug", element: <CourseDetailsPage /> },
+            {
+                path: "/courses/:courseSlug/lessons/:lessonSlug",
+                element: <LessonPage />,
+            },
+        ],
+    },
 
-  {
-    element: (
-      <ProtectedRoute>
-        <DashboardLayout />
-      </ProtectedRoute>
-    ),
-    children: [
-      { path: "/dashboard", element: <DashboardPage /> },
-      { path: "/settings", element: <SettingsPage /> },
-      { path: "/profile", element: <ProfilePage /> },
-      { path: "/bookmarks", element: <BookmarksPage /> },
-    ],
-  },
+    {
+        element: (
+            <ProtectedRoute>
+                <DashboardLayout />
+            </ProtectedRoute>
+        ),
+        children: [
+            { path: "/dashboard", element: <DashboardPage /> },
+            { path: "/settings", element: <SettingsPage /> },
+            { path: "/profile", element: <ProfilePage /> },
+            { path: "/bookmarks", element: <BookmarksPage /> },
+        ],
+    },
+    {
+        element: (
+            <AdminRoute>
+                <AdminLayout />
+            </AdminRoute>
+        ),
+        children: [
+            { path: "/admin", element: <AdminDashboardPage /> },
+            { path: "/admin/courses", element: <AdminCoursesPage /> },
+            { path: "/admin/lessons", element: <AdminLessonsPage /> },
+        ],
+    },
 
-  {
-    element: <PublicLayout />,
-    children: [{ path: "*", element: <NotFoundPage /> }],
-  },
+    {
+        element: <PublicLayout />,
+        children: [{ path: "*", element: <NotFoundPage /> }],
+    },
 ]);

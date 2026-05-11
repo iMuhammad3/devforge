@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
 
 import { useAuthStore } from "@/features/auth/store/authStore";
 import {
@@ -7,6 +6,7 @@ import {
     updateUserProfile,
 } from "@/services/firebase/firestore";
 import { ErrorState, LoadingState } from "@/shared/components/feedback";
+import { FormMessage, SubmitButton, TextareaInput, TextInput } from "@/shared/components/forms";
 
 export default function SettingsPage() {
     const authUser = useAuthStore(state => state.user);
@@ -90,17 +90,17 @@ export default function SettingsPage() {
     };
 
     if (status === "loading") {
-  return (
-    <LoadingState
-      title="Loading settings"
-      description="Fetching your profile settings."
-    />
-  );
-}
+        return (
+            <LoadingState
+                title="Loading settings"
+                description="Fetching your profile settings."
+            />
+        );
+    }
 
-if (status === "error") {
-  return <ErrorState description={error} />;
-}
+    if (status === "error") {
+        return <ErrorState description={error} />;
+    }
 
     return (
         <section className="mx-auto max-w-3xl">
@@ -120,91 +120,43 @@ if (status === "error") {
                 onSubmit={handleSubmit}
                 className="rounded-2xl border border-border bg-card p-6"
             >
-                {message && (
-                    <div className="mb-5 rounded-lg border border-primary/30 bg-primary/10 px-4 py-3 text-sm text-primary">
-                        {message}
-                    </div>
-                )}
-
-                {error && (
-                    <div className="mb-5 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                        {error}
-                    </div>
-                )}
+                <div className="mb-5 space-y-3">
+                    <FormMessage>{message}</FormMessage>
+                    <FormMessage type="error">{error}</FormMessage>
+                </div>
 
                 <div className="grid gap-5">
-                    <div>
-                        <label
-                            htmlFor="displayName"
-                            className="mb-2 block text-sm font-medium"
-                        >
-                            Display name
-                        </label>
+                    <TextInput
+                        label="Display name"
+                        name="displayName"
+                        value={formData.displayName}
+                        onChange={handleChange}
+                        placeholder="Muhammad Auwal"
+                    />
 
-                        <input
-                            id="displayName"
-                            name="displayName"
-                            type="text"
-                            value={formData.displayName}
-                            onChange={handleChange}
-                            className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                            placeholder="Muhammad Auwal"
-                        />
-                    </div>
+                    <TextInput
+                        label="Username"
+                        name="username"
+                        value={formData.username}
+                        onChange={handleChange}
+                        placeholder="muhammad"
+                        helpText="Your username will be used for your public profile later."
+                    />
 
-                    <div>
-                        <label
-                            htmlFor="username"
-                            className="mb-2 block text-sm font-medium"
-                        >
-                            Username
-                        </label>
-
-                        <input
-                            id="username"
-                            name="username"
-                            type="text"
-                            value={formData.username}
-                            onChange={handleChange}
-                            className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                            placeholder="muhammad"
-                        />
-
-                        <p className="mt-2 text-xs text-muted-foreground">
-                            Your username will be used for your public profile
-                            later.
-                        </p>
-                    </div>
-
-                    <div>
-                        <label
-                            htmlFor="bio"
-                            className="mb-2 block text-sm font-medium"
-                        >
-                            Bio
-                        </label>
-
-                        <textarea
-                            id="bio"
-                            name="bio"
-                            value={formData.bio}
-                            onChange={handleChange}
-                            rows="5"
-                            className="w-full resize-none rounded-lg border border-input bg-background px-3 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20"
-                            placeholder="Tell people a little about yourself..."
-                        />
-                    </div>
+                    <TextareaInput
+                        label="Bio"
+                        name="bio"
+                        value={formData.bio}
+                        onChange={handleChange}
+                        placeholder="Tell people a little about yourself..."
+                        rows={5}
+                    />
                 </div>
 
                 <div className="mt-6 flex justify-end">
-                    <button
-                        type="submit"
-                        disabled={status === "saving"}
-                        className="inline-flex h-10 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                        <Save className="h-4 w-4" />
-                        {status === "saving" ? "Saving..." : "Save changes"}
-                    </button>
+                    <SubmitButton loading={status === "saving"}>
+                        Save changes
+                    </SubmitButton>
                 </div>
             </form>
         </section>

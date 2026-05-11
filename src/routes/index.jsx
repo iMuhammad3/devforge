@@ -20,6 +20,7 @@ import AdminLayout from "@/layouts/AdminLayout";
 import {
     AdminCoursesPage,
     AdminDashboardPage,
+    AdminEditCoursePage,
     AdminLessonsPage,
     AdminNewCoursePage,
 } from "@/features/admin";
@@ -68,6 +69,10 @@ export const router = createBrowserRouter([
             { path: "/admin", element: <AdminDashboardPage /> },
             { path: "/admin/courses", element: <AdminCoursesPage /> },
             { path: "/admin/lessons", element: <AdminLessonsPage /> },
+            {
+                path: "/admin/courses/:courseId/edit",
+                element: <AdminEditCoursePage />,
+            },
             { path: "/admin/courses/new", element: <AdminNewCoursePage /> },
         ],
     },

@@ -1,12 +1,17 @@
 import {
   createCourse,
-  getAllCoursesForAdmin,
-  updateCourse,
   deleteCourse,
+  getAllCoursesForAdmin,
+  getCourseById,
+  updateCourse,
 } from "@/services/firebase/firestore";
 
 export const fetchAdminCourses = async () => {
   return getAllCoursesForAdmin();
+};
+
+export const fetchAdminCourseById = async (courseId) => {
+  return getCourseById(courseId);
 };
 
 export const createAdminCourse = async (courseData) => {

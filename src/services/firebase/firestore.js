@@ -316,6 +316,18 @@ export const getAllCoursesForAdmin = async () => {
   return courses.sort((a, b) => (a.order || 0) - (b.order || 0));
 };
 
+export const getCourseById = async (courseId) => {
+  const courseRef = doc(db, "courses", courseId);
+  const courseSnap = await getDoc(courseRef);
+
+  if (!courseSnap.exists()) return null;
+
+  return {
+    id: courseSnap.id,
+    ...courseSnap.data(),
+  };
+};
+
 export const createCourse = async (courseData) => {
   const coursesRef = collection(db, "courses");
 

@@ -1,16 +1,81 @@
-# React + Vite
+# DevForge
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+DevForge is a frontend-focused learning platform built with React, Tailwind CSS, and Firebase.
 
-Currently, two official plugins are available:
+It allows users to browse courses, read markdown-based lessons, bookmark lessons, track progress, and continue learning from where they stopped. It also includes a protected admin area for creating and managing courses and lessons.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+### Public learning experience
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Landing page
+- Course browsing
+- Course search and filtering
+- Course detail pages
+- Markdown-based lesson pages
+- Syntax-highlighted code blocks
+- Copy code button
+- Lesson reading time
+- Lesson table of contents
+- Previous/next lesson navigation
+- Dark/light mode
+- Responsive navigation
 
-## Expanding the ESLint configuration
+### Authenticated user features
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Google authentication
+- Firestore user profiles
+- Dashboard
+- Profile settings
+- Public profile page
+- Lesson bookmarks
+- Lesson completion
+- Course progress
+- Continue learning experience
+
+### Admin features
+
+- Protected admin routes
+- Role-based admin access
+- Admin dashboard with content stats
+- Create/edit courses
+- Publish/unpublish courses
+- Archive/restore courses
+- Search/filter admin courses
+- Create/edit lessons
+- Markdown lesson editor
+- Markdown preview
+- Lesson content template helper
+- Estimated reading time
+- Unsaved changes warning
+- Publish/unpublish lessons
+- Archive/restore lessons
+- Search/filter admin lessons
+
+## Tech Stack
+
+- React
+- Vite
+- JavaScript / JSX
+- Tailwind CSS
+- Firebase Authentication
+- Cloud Firestore
+- Firebase Storage
+- Zustand
+- React Router
+- React Markdown
+- React Syntax Highlighter
+- lucide-react
+
+## Project Structure
+
+```txt
+src/
+├── app/
+├── features/
+├── layouts/
+├── routes/
+├── services/
+├── shared/
+├── styles/
+└── main.jsx

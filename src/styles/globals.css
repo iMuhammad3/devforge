@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  scroll-behavior: smooth;
+}
+
 :root {
   --background: 250 250 250;
   --foreground: 24 24 27;

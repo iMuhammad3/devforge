@@ -15,6 +15,8 @@ import { fetchUserCourseProgress } from "@/features/progress/api/progressApi";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { CompleteLessonButton } from "@/features/progress";
 import { getReadingTime } from "@/shared/utils/readingTime";
+import LessonTableOfContents from "../components/LessonTableOfContents";
+import { extractMarkdownHeadings } from "@/shared/utils/headings";
 
 export default function LessonPage() {
     const { courseSlug, lessonSlug } = useParams();
@@ -92,7 +94,12 @@ export default function LessonPage() {
         currentIndex >= 0 && currentIndex < lessons.length - 1
             ? lessons[currentIndex + 1]
             : null;
+
     const readingTime = lesson ? getReadingTime(lesson.content) : null;
+
+    const tableOfContents = lesson
+        ? extractMarkdownHeadings(lesson.content)
+        : [];
 
     if (status === "loading") {
         return (
@@ -139,85 +146,89 @@ export default function LessonPage() {
                 completedLessonIds={completedLessonIds}
             />
 
-            <article className="min-w-0 flex-1">
-                <div className="mx-auto max-w-3xl px-6 py-10">
-                    <Link
-                        to={`/courses/${courseSlug}`}
-                        className="text-sm text-muted-foreground hover:text-foreground"
-                    >
-                        ← Back to course
-                    </Link>
+            <div className="grid min-w-0 flex-1 xl:grid-cols-[minmax(0,1fr)_16rem]">
+                <article className="min-w-0">
+                    <div className="mx-auto max-w-3xl px-6 py-10">
+                        <Link
+                            to={`/courses/${courseSlug}`}
+                            className="text-sm text-muted-foreground hover:text-foreground"
+                        >
+                            ← Back to course
+                        </Link>
 
-                    <header className="mt-8 border-b border-border pb-8">
-                        <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-primary">
-                            <span>Lesson {lesson.order}</span>
+                        <header className="mt-8 border-b border-border pb-8">
+                            <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-primary">
+                                <span>Lesson {lesson.order}</span>
 
-                            {readingTime && (
-                                <>
-                                    <span className="text-muted-foreground">
-                                        ·
-                                    </span>
-                                    <span>{readingTime.label}</span>
-                                </>
+                                {readingTime && (
+                                    <>
+                                        <span className="text-muted-foreground">
+                                            ·
+                                        </span>
+                                        <span>{readingTime.label}</span>
+                                    </>
+                                )}
+                            </div>
+
+                            <h1 className="mt-3 text-4xl font-bold tracking-tight">
+                                {lesson.title}
+                            </h1>
+
+                            {lesson.description && (
+                                <p className="mt-4 text-lg leading-8 text-muted-foreground">
+                                    {lesson.description}
+                                </p>
+                            )}
+
+                            <div className="mt-6 flex flex-wrap gap-3">
+                                <BookmarkButton lesson={lesson} />
+                                <CompleteLessonButton
+                                    lesson={lesson}
+                                    onProgressChange={handleProgressChange}
+                                />
+                            </div>
+                        </header>
+
+                        <div className="mt-8">
+                            <MarkdownRenderer content={lesson.content} />
+                        </div>
+
+                        <div className="mt-12 grid gap-4 border-t border-border pt-8 sm:grid-cols-2">
+                            {previousLesson ? (
+                                <Link
+                                    to={`/courses/${courseSlug}/lessons/${previousLesson.slug}`}
+                                    className="rounded-xl border border-border bg-card p-4 transition hover:bg-muted"
+                                >
+                                    <p className="text-sm text-muted-foreground">
+                                        Previous
+                                    </p>
+                                    <h3 className="mt-1 font-medium">
+                                        {previousLesson.title}
+                                    </h3>
+                                </Link>
+                            ) : (
+                                <div />
+                            )}
+
+                            {nextLesson && (
+                                <Link
+                                    to={`/courses/${courseSlug}/lessons/${nextLesson.slug}`}
+                                    className="rounded-xl border border-border bg-card p-4 text-right transition hover:bg-muted"
+                                >
+                                    <p className="text-sm text-muted-foreground">
+                                        Next
+                                    </p>
+                                    <h3 className="mt-1 font-medium">
+                                        {nextLesson.title}
+                                    </h3>
+                                </Link>
                             )}
                         </div>
-
-                        <h1 className="mt-3 text-4xl font-bold tracking-tight">
-                            {lesson.title}
-                        </h1>
-
-                        {lesson.description && (
-                            <p className="mt-4 text-lg leading-8 text-muted-foreground">
-                                {lesson.description}
-                            </p>
-                        )}
-
-                        <div className="mt-6 flex flex-wrap gap-3">
-                            <BookmarkButton lesson={lesson} />
-                            <CompleteLessonButton
-                                lesson={lesson}
-                                onProgressChange={handleProgressChange}
-                            />
-                        </div>
-                    </header>
-
-                    <div className="mt-8">
-                        <MarkdownRenderer content={lesson.content} />
                     </div>
+                </article>
 
-                    <div className="mt-12 grid gap-4 border-t border-border pt-8 sm:grid-cols-2">
-                        {previousLesson ? (
-                            <Link
-                                to={`/courses/${courseSlug}/lessons/${previousLesson.slug}`}
-                                className="rounded-xl border border-border bg-card p-4 transition hover:bg-muted"
-                            >
-                                <p className="text-sm text-muted-foreground">
-                                    Previous
-                                </p>
-                                <h3 className="mt-1 font-medium">
-                                    {previousLesson.title}
-                                </h3>
-                            </Link>
-                        ) : (
-                            <div />
-                        )}
-
-                        {nextLesson && (
-                            <Link
-                                to={`/courses/${courseSlug}/lessons/${nextLesson.slug}`}
-                                className="rounded-xl border border-border bg-card p-4 text-right transition hover:bg-muted"
-                            >
-                                <p className="text-sm text-muted-foreground">
-                                    Next
-                                </p>
-                                <h3 className="mt-1 font-medium">
-                                    {nextLesson.title}
-                                </h3>
-                            </Link>
-                        )}
-                    </div>
-                </div>
-            </article>
+                <LessonTableOfContents headings={tableOfContents} />
+            </div>
         </div>
     );
 }

@@ -5,16 +5,21 @@ import MarkdownRenderer from "../components/MarkdownRenderer";
 import { fetchLessonBySlug, fetchLessonsByCourseSlug } from "../api/lessonsApi";
 import LessonSidebar from "../components/LessonSidebar";
 import BookmarkButton from "@/features/bookmarks/components/BookmarkButton";
-import { EmptyState, ErrorState, LoadingState } from "@/shared/components/feedback";
+import {
+    EmptyState,
+    ErrorState,
+    LoadingState,
+} from "@/shared/components/feedback";
 import { BookOpen } from "lucide-react";
 import { fetchUserCourseProgress } from "@/features/progress/api/progressApi";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { CompleteLessonButton } from "@/features/progress";
+import { getReadingTime } from "@/shared/utils/readingTime";
 
 export default function LessonPage() {
     const { courseSlug, lessonSlug } = useParams();
 
-    const user = useAuthStore((state) => state.user);
+    const user = useAuthStore(state => state.user);
     const [courseProgress, setCourseProgress] = useState([]);
 
     const [lesson, setLesson] = useState(null);
@@ -28,10 +33,13 @@ export default function LessonPage() {
                 setStatus("loading");
                 setError("");
 
-                const [lessonData, lessonsData, progressData] = await Promise.all([
-                    fetchLessonBySlug(courseSlug, lessonSlug),
-                    fetchLessonsByCourseSlug(courseSlug),
-                    user?.uid ? fetchUserCourseProgress(user.uid, courseSlug) : [],
+                const [lessonData, lessonsData, progressData] =
+                    await Promise.all([
+                        fetchLessonBySlug(courseSlug, lessonSlug),
+                        fetchLessonsByCourseSlug(courseSlug),
+                        user?.uid
+                            ? fetchUserCourseProgress(user.uid, courseSlug)
+                            : [],
                     ]);
 
                 if (!lessonData) {
@@ -54,23 +62,25 @@ export default function LessonPage() {
     }, [courseSlug, lessonSlug, user?.uid]);
 
     const completedLessonIds = useMemo(() => {
-        return courseProgress.map((item) => item.lessonId);
-        }, [courseProgress]);
+        return courseProgress.map(item => item.lessonId);
+    }, [courseProgress]);
 
-    const handleProgressChange = (event) => {
+    const handleProgressChange = event => {
         if (event.type === "added") {
-            setCourseProgress((currentProgress) => [
-            ...currentProgress,
-            event.progress,
+            setCourseProgress(currentProgress => [
+                ...currentProgress,
+                event.progress,
             ]);
         }
 
         if (event.type === "removed") {
-            setCourseProgress((currentProgress) =>
-            currentProgress.filter((item) => item.lessonId !== event.lessonId)
+            setCourseProgress(currentProgress =>
+                currentProgress.filter(
+                    item => item.lessonId !== event.lessonId,
+                ),
             );
         }
-        };
+    };
 
     const currentIndex = useMemo(() => {
         return lessons.findIndex(item => item.slug === lessonSlug);
@@ -82,43 +92,44 @@ export default function LessonPage() {
         currentIndex >= 0 && currentIndex < lessons.length - 1
             ? lessons[currentIndex + 1]
             : null;
+    const readingTime = lesson ? getReadingTime(lesson.content) : null;
 
     if (status === "loading") {
-  return (
-    <LoadingState
-      title="Loading lesson"
-      description="Preparing your lesson content."
-    />
-  );
-}
+        return (
+            <LoadingState
+                title="Loading lesson"
+                description="Preparing your lesson content."
+            />
+        );
+    }
 
     if (status === "not-found") {
-  return (
-    <section className="mx-auto max-w-4xl px-6 py-10">
-      <EmptyState
-        icon={<BookOpen className="h-5 w-5" />}
-        title="Lesson not found"
-        description="This lesson does not exist, is unpublished, or the URL is incorrect."
-        action={
-          <Link
-            to={`/courses/${courseSlug}`}
-            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
-          >
-            Back to course
-          </Link>
-        }
-      />
-    </section>
-  );
-}
+        return (
+            <section className="mx-auto max-w-4xl px-6 py-10">
+                <EmptyState
+                    icon={<BookOpen className="h-5 w-5" />}
+                    title="Lesson not found"
+                    description="This lesson does not exist, is unpublished, or the URL is incorrect."
+                    action={
+                        <Link
+                            to={`/courses/${courseSlug}`}
+                            className="inline-flex h-10 items-center justify-center rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                        >
+                            Back to course
+                        </Link>
+                    }
+                />
+            </section>
+        );
+    }
 
     if (status === "error") {
-  return (
-    <section className="mx-auto max-w-4xl px-6 py-10">
-      <ErrorState description={error} />
-    </section>
-  );
-}
+        return (
+            <section className="mx-auto max-w-4xl px-6 py-10">
+                <ErrorState description={error} />
+            </section>
+        );
+    }
     return (
         <div className="flex">
             <LessonSidebar
@@ -126,7 +137,7 @@ export default function LessonPage() {
                 lessons={lessons}
                 currentLessonSlug={lessonSlug}
                 completedLessonIds={completedLessonIds}
-                />
+            />
 
             <article className="min-w-0 flex-1">
                 <div className="mx-auto max-w-3xl px-6 py-10">
@@ -138,9 +149,18 @@ export default function LessonPage() {
                     </Link>
 
                     <header className="mt-8 border-b border-border pb-8">
-                        <p className="text-sm font-medium text-primary">
-                            Lesson {lesson.order}
-                        </p>
+                        <div className="flex flex-wrap items-center gap-2 text-sm font-medium text-primary">
+                            <span>Lesson {lesson.order}</span>
+
+                            {readingTime && (
+                                <>
+                                    <span className="text-muted-foreground">
+                                        ·
+                                    </span>
+                                    <span>{readingTime.label}</span>
+                                </>
+                            )}
+                        </div>
 
                         <h1 className="mt-3 text-4xl font-bold tracking-tight">
                             {lesson.title}

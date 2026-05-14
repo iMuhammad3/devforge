@@ -8,7 +8,7 @@ import {
     ErrorState,
     LoadingState,
 } from "@/shared/components/feedback";
-import { BookOpen } from "lucide-react";
+import { ArrowRight, BookOpen } from "lucide-react";
 import { fetchUserCourseProgress } from "@/features/progress/api/progressApi";
 import { useAuthStore } from "@/features/auth/store/authStore";
 
@@ -59,6 +59,14 @@ export default function CourseDetailsPage() {
         totalLessons > 0
             ? Math.round((completedCount / totalLessons) * 100)
             : 0;
+    const completedLessonIds = courseProgress.map(item => item.lessonId);
+
+    const nextLesson =
+        lessons.find(lesson => !completedLessonIds.includes(lesson.id)) ||
+        lessons[0];
+
+    const isCourseCompleted =
+        totalLessons > 0 && completedCount === totalLessons;
 
     if (status === "loading") {
         return (
@@ -117,33 +125,55 @@ export default function CourseDetailsPage() {
 
                 {totalLessons > 0 && (
                     <div className="mt-8 rounded-2xl border border-border bg-card p-5">
-                        <div className="flex items-center justify-between gap-4">
-                            <div>
-                                <h2 className="font-semibold">
-                                    Course progress
-                                </h2>
-                                <p className="mt-1 text-sm text-muted-foreground">
-                                    {completedCount} of {totalLessons} lessons
-                                    completed
-                                </p>
+                        <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
+                            <div className="flex-1">
+                                <div className="flex items-center justify-between gap-4">
+                                    <div>
+                                        <h2 className="font-semibold">
+                                            Course progress
+                                        </h2>
+                                        <p className="mt-1 text-sm text-muted-foreground">
+                                            {completedCount} of {totalLessons}{" "}
+                                            lessons completed
+                                        </p>
+                                    </div>
+
+                                    <p className="text-sm font-medium text-primary">
+                                        {progressPercentage}%
+                                    </p>
+                                </div>
+
+                                <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
+                                    <div
+                                        className="h-full rounded-full bg-primary transition-all"
+                                        style={{
+                                            width: `${progressPercentage}%`,
+                                        }}
+                                    />
+                                </div>
                             </div>
 
-                            <p className="text-sm font-medium text-primary">
-                                {progressPercentage}%
-                            </p>
-                        </div>
-
-                        <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
-                            <div
-                                className="h-full rounded-full bg-primary transition-all"
-                                style={{ width: `${progressPercentage}%` }}
-                            />
+                            {nextLesson && (
+                                <Link
+                                    to={`/courses/${course.slug}/lessons/${nextLesson.slug}`}
+                                    className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+                                >
+                                    {isCourseCompleted
+                                        ? "Review course"
+                                        : "Continue learning"}
+                                    <ArrowRight className="h-4 w-4" />
+                                </Link>
+                            )}
                         </div>
                     </div>
                 )}
 
                 <div className="mt-8">
-                    <LessonList courseSlug={course.slug} lessons={lessons} />
+                    <LessonList
+                        courseSlug={course.slug}
+                        lessons={lessons}
+                        completedLessonIds={completedLessonIds}
+                    />
                 </div>
             </div>
         </section>

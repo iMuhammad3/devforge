@@ -315,6 +315,26 @@ export const unmarkLessonComplete = async progressId => {
     await deleteDoc(progressDocRef);
 };
 
+export const getUserProgress = async (userId) => {
+  const progressRef = collection(db, "progress");
+
+  const q = query(progressRef, where("userId", "==", userId));
+
+  const snap = await getDocs(q);
+
+  const progress = snap.docs.map((doc) => ({
+    id: doc.id,
+    ...doc.data(),
+  }));
+
+  return progress.sort((a, b) => {
+    const dateA = a.completedAt?.toDate?.() || new Date(0);
+    const dateB = b.completedAt?.toDate?.() || new Date(0);
+
+    return dateB - dateA;
+  });
+};
+
 /**
  * ADMIN COURSES
  */

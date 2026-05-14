@@ -1,6 +1,7 @@
 import {
   getLessonProgress,
   getUserCourseProgress,
+  getUserProgress,
   markLessonComplete,
   unmarkLessonComplete,
 } from "@/services/firebase/firestore";
@@ -19,4 +20,8 @@ export const completeLesson = async (progressData) => {
 
 export const undoLessonComplete = async (progressId) => {
   return unmarkLessonComplete(progressId);
+};
+
+export const fetchUserProgress = async (userId) => {
+  return getUserProgress(userId);
 };

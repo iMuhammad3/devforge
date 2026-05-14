@@ -1,6 +1,11 @@
 import { Link } from "react-router-dom";
+import { CheckCircle2 } from "lucide-react";
 
-export default function LessonList({ courseSlug, lessons }) {
+export default function LessonList({
+  courseSlug,
+  lessons,
+  completedLessonIds = [],
+}) {
   if (!lessons.length) {
     return (
       <div className="rounded-xl border border-border bg-card p-6">
@@ -19,29 +24,51 @@ export default function LessonList({ courseSlug, lessons }) {
       </div>
 
       <div className="divide-y divide-border">
-        {lessons.map((lesson) => (
-          <Link
-            key={lesson.id}
-            to={`/courses/${courseSlug}/lessons/${lesson.slug}`}
-            className="block p-4 transition hover:bg-muted"
-          >
-            <div className="flex items-start gap-4">
-              <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-medium text-primary">
-                {lesson.order}
-              </span>
+        {lessons.map((lesson) => {
+          const isCompleted = completedLessonIds.includes(lesson.id);
 
-              <div>
-                <h3 className="font-medium">{lesson.title}</h3>
+          return (
+            <Link
+              key={lesson.id}
+              to={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+              className="block p-4 transition hover:bg-muted"
+            >
+              <div className="flex items-start gap-4">
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-medium ${
+                    isCompleted
+                      ? "bg-primary text-primary-foreground"
+                      : "bg-primary/10 text-primary"
+                  }`}
+                >
+                  {isCompleted ? (
+                    <CheckCircle2 className="h-4 w-4" />
+                  ) : (
+                    lesson.order
+                  )}
+                </span>
 
-                {lesson.description && (
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {lesson.description}
-                  </p>
-                )}
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3 className="font-medium">{lesson.title}</h3>
+
+                    {isCompleted && (
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium text-primary">
+                        Completed
+                      </span>
+                    )}
+                  </div>
+
+                  {lesson.description && (
+                    <p className="mt-1 text-sm text-muted-foreground">
+                      {lesson.description}
+                    </p>
+                  )}
+                </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </div>
   );

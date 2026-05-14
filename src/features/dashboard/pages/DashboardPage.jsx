@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { BookOpen, Bookmark, Settings, User } from "lucide-react";
 
 import { useAuthStore } from "@/features/auth/store/authStore";
+import ContinueLearningCard from "../components/ContinueLearningCard";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
@@ -28,7 +29,7 @@ const profile = useAuthStore((state) => state.profile);
         <div className="grid gap-6">
           <QuickActions />
 
-          <LearningOverview />
+          <ContinueLearningCard />
         </div>
       </div>
     </section>

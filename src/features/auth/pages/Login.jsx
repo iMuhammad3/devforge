@@ -41,7 +41,7 @@ export default function Login() {
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            Continue learning frontend development with saved progress,
+            Continue learning programming with saved progress,
             bookmarks, and a personalized experience.
           </p>
         </div>

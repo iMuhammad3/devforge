@@ -28,7 +28,7 @@ const initialFormData = {
     description: "",
     content: "",
     order: 1,
-    published: false,
+    published: true,
 };
 
 export default function AdminNewLessonPage() {

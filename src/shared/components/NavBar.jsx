@@ -51,7 +51,9 @@ export default function Navbar() {
 
                     {user ? (
                         <div className="flex items-center gap-3">
-                            <UserAvatar user={user} />
+                            <Link to='/profile'>
+                                <UserAvatar user={user} />
+                            </Link>
 
                             <button
                                 type="button"

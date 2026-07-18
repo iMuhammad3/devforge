@@ -7,11 +7,9 @@ import {
 } from "@/shared/components/forms";
 
 const CATEGORY_OPTIONS = [
-  { label: "HTML", value: "HTML" },
-  { label: "CSS", value: "CSS" },
-  { label: "JavaScript", value: "JavaScript" },
-  { label: "React", value: "React" },
-  { label: "Tailwind", value: "Tailwind" },
+  { label: "Programming Language", value: "Language" },
+  { label: "Data Structures", value: "Data Structures" },
+  { label: "Algorithms", value: "Algorithms" },
 ];
 
 const LEVEL_OPTIONS = [
@@ -48,7 +46,7 @@ export default function CourseForm({
           name="title"
           value={formData.title}
           onChange={onChange}
-          placeholder="HTML Foundations"
+          placeholder="C Programming for Beginners"
           error={errors.title}
           required
         />
@@ -58,7 +56,7 @@ export default function CourseForm({
           name="slug"
           value={formData.slug}
           onChange={onChange}
-          placeholder="html-foundations"
+          placeholder="c-programming-for-beginners"
           helpText="This controls the course URL. Keep it lowercase and readable."
           error={errors.slug}
           required

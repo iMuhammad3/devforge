@@ -13,26 +13,25 @@ export default function HomePage() {
                 <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl flex-col items-center justify-center px-6 py-20 text-center">
                     <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2 text-sm text-muted-foreground">
                         <Sparkles className="h-4 w-4 text-primary" />
-                        Frontend learning, built properly.
+                        Learning core programming fundamentals
                     </div>
 
                     <h1 className="max-w-4xl text-4xl font-bold tracking-tight md:text-6xl">
-                        Learn frontend development through clean, practical
+                        Learn programming through clean, practical
                         lessons.
                     </h1>
 
                     <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground">
-                        DevForge helps you learn HTML, CSS, JavaScript, React,
-                        Tailwind, and modern frontend architecture with
-                        beginner-friendly explanations and real-world examples.
+                        DevForge helps you learn C language, Data structures, Algorithms, Web Development and modern programming principles with
+                        the help of beginner-friendly explanations and real-world examples.
                     </p>
 
                     <div className="mt-10 flex flex-col gap-3 sm:flex-row">
                         <Link
-                            to={user ? "/dashboard" : "/courses"}
+                            to={user ? "/dashboard" : "/login"}
                             className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground transition hover:opacity-90"
                         >
-                            {user ? "Go to dashboard" : "Browse courses"}
+                            {user ? "Go to dashboard" : "Login"}
                             <ArrowRight className="h-4 w-4" />
                         </Link>
 
@@ -55,7 +54,7 @@ export default function HomePage() {
                             </p>
 
                             <h2 className="mt-2 text-3xl font-bold tracking-tight">
-                                Continue building your frontend skills
+                                Continue building your programming skills
                                 {profile?.displayName
                                     ? `, ${profile.displayName}`
                                     : ""}
@@ -64,7 +63,7 @@ export default function HomePage() {
 
                             <p className="mt-4 leading-7 text-muted-foreground">
                                 Jump back into your most recent course, review
-                                completed lessons, or browse more frontend
+                                completed lessons, or browse more programming
                                 topics when you’re ready.
                             </p>
 
@@ -90,33 +89,33 @@ export default function HomePage() {
                         </p>
 
                         <h2 className="mt-2 text-3xl font-bold tracking-tight">
-                            Start with the frontend fundamentals.
+                            Start with the programming fundamentals.
                         </h2>
 
                         <p className="mt-4 text-muted-foreground">
                             The platform begins with the core technologies every
-                            frontend developer needs before moving into more
-                            advanced React patterns.
+                            aspiring developer needs before moving into more
+                            advanced programming concepts.
                         </p>
                     </div>
 
                     <div className="grid gap-5 md:grid-cols-3">
                         <FeatureCard
                             icon={<BookOpen className="h-5 w-5" />}
-                            title="HTML & Semantics"
-                            description="Learn how to structure pages properly using semantic, accessible HTML."
+                            title="C Programming"
+                            description="Learn how to use pointers and allocate memory using C"
                         />
 
                         <FeatureCard
                             icon={<Layers className="h-5 w-5" />}
-                            title="CSS & Layouts"
-                            description="Master styling, spacing, responsive layouts, Flexbox, Grid, and modern CSS."
+                            title="Data Structures"
+                            description="Understand how collections of data are organized, manipulated and accessed."
                         />
 
                         <FeatureCard
                             icon={<Code2 className="h-5 w-5" />}
-                            title="JavaScript & React"
-                            description="Build interactive interfaces using JavaScript, components, hooks, and routing."
+                            title="Algorithms"
+                            description="Learn the step-by-step logic used to process data efficiently."
                         />
                     </div>
                 </div>
@@ -137,20 +136,20 @@ export default function HomePage() {
 
                         <p className="mt-4 leading-7 text-muted-foreground">
                             Many tutorials show you what to type. DevForge is
-                            designed to explain how frontend concepts work, why
+                            designed to explain how programming concepts work, why
                             they matter, and how to use them in real projects.
                         </p>
                     </div>
 
                     <div className="grid gap-4">
                         <ReasonItem
-                            title="Frontend-focused"
-                            description="No scattered topics. The platform starts with frontend development and goes deep."
+                            title="Foundation focused"
+                            description="No scattered topics. The platform starts with programming fundamentals and goes deep."
                         />
 
                         <ReasonItem
                             title="Practical examples"
-                            description="Lessons are designed around examples you can actually use when building websites and apps."
+                            description="Lessons are designed around examples you can actually use when building apps."
                         />
 
                         <ReasonItem
@@ -165,13 +164,12 @@ export default function HomePage() {
             <section className="border-t border-border px-6 py-20">
                 <div className="mx-auto max-w-4xl rounded-2xl border border-border bg-card p-8 text-center md:p-12">
                     <h2 className="text-3xl font-bold tracking-tight">
-                        Start learning frontend the right way.
+                        Start learning programming the right way.
                     </h2>
 
                     <p className="mx-auto mt-4 max-w-2xl text-muted-foreground">
                         Begin with beginner-friendly courses and gradually work
-                        your way toward building polished, real-world frontend
-                        projects.
+                        your way toward building polished, real-world projects.
                     </p>
 
                     <Link

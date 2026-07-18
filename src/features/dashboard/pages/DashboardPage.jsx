@@ -18,7 +18,7 @@ const profile = useAuthStore((state) => state.profile);
         </h1>
 
         <p className="mt-4 max-w-2xl text-muted-foreground">
-          Continue learning frontend development, manage your account, and keep
+          Continue learning software development, manage your account, and keep
           track of useful lessons as DevForge grows.
         </p>
       </div>
@@ -90,7 +90,7 @@ function QuickActions() {
           to="/courses"
           icon={<BookOpen className="h-5 w-5" />}
           title="Browse courses"
-          description="Continue learning frontend topics."
+          description="Continue learning programming topics."
         />
 
         <DashboardLink
@@ -127,22 +127,5 @@ function DashboardLink({ to, icon, title, description }) {
         {description}
       </p>
     </Link>
-  );
-}
-
-function LearningOverview() {
-  return (
-    <div className="rounded-2xl border border-border bg-card p-6">
-      <h2 className="text-lg font-semibold">Learning overview</h2>
-
-      <div className="mt-5 rounded-xl border border-dashed border-border bg-background p-6 text-center">
-        <p className="font-medium">Progress tracking coming soon</p>
-
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-muted-foreground">
-          Later, this area can show completed lessons, saved courses, recent
-          activity, and recommended next lessons.
-        </p>
-      </div>
-    </div>
   );
 }

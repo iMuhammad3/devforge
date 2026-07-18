@@ -73,7 +73,7 @@ export default function CoursesPage() {
     return (
       <LoadingState
         title="Loading courses"
-        description="Fetching frontend courses from DevForge."
+        description="Fetching courses from DevForge."
       />
     );
   }
@@ -92,12 +92,11 @@ export default function CoursesPage() {
         <p className="mb-2 text-sm font-medium text-primary">Courses</p>
 
         <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          Learn frontend development properly.
+          Learn Software Development properly.
         </h1>
 
         <p className="mt-4 max-w-2xl text-muted-foreground">
-          Practical, beginner-friendly courses on HTML, CSS, JavaScript, React,
-          Tailwind, and modern frontend engineering.
+          Practical, beginner-friendly courses on C, Python, Data structures and Algorithms.
         </p>
       </div>
 

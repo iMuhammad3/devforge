@@ -11,7 +11,7 @@ const initialFormData = {
     title: "",
     slug: "",
     description: "",
-    category: "HTML",
+    category: "Language",
     level: "Beginner",
     order: 1,
     published: false,

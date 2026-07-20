@@ -145,7 +145,7 @@ export default function LessonPage() {
                 completedLessonIds={completedLessonIds}
             />
 
-            <div className="grid min-w-0 flex-1 xl:grid-cols-[minmax(0,1fr)_16rem]">
+            <div className="flex-1">
                 <article className="min-w-0">
                     <div className="mx-auto max-w-3xl px-6 py-10">
                         <Link

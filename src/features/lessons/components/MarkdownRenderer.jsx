@@ -1,7 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import CodeBlock from "./Codeblock";
-import { slugifyHeading } from "@/shared/utils/headings";
+import { getNodeText, slugifyHeading } from "@/shared/utils/headings";
 
 export default function MarkdownRenderer({ content }) {
     return (
@@ -18,7 +18,7 @@ export default function MarkdownRenderer({ content }) {
                     },
 
                     h2({ children }) {
-                        const text = String(children);
+                        const text = getNodeText(children);
                         const id = slugifyHeading(text);
 
                         return (
@@ -32,7 +32,7 @@ export default function MarkdownRenderer({ content }) {
                     },
 
                     h3({ children }) {
-                        const text = String(children);
+                        const text = getNodeText(children);
                         const id = slugifyHeading(text);
 
                         return (

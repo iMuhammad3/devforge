@@ -15,8 +15,6 @@ import { fetchUserCourseProgress } from "@/features/progress/api/progressApi";
 import { useAuthStore } from "@/features/auth/store/authStore";
 import { CompleteLessonButton } from "@/features/progress";
 import { getReadingTime } from "@/shared/utils/readingTime";
-import LessonTableOfContents from "../components/LessonTableOfContents";
-import { extractMarkdownHeadings } from "@/shared/utils/headings";
 
 export default function LessonPage() {
     const { courseSlug, lessonSlug } = useParams();
@@ -97,9 +95,10 @@ export default function LessonPage() {
 
     const readingTime = lesson ? getReadingTime(lesson.content) : null;
 
-    const tableOfContents = lesson
-        ? extractMarkdownHeadings(lesson.content)
-        : [];
+    // Table of comments have been removed for the mean time
+    // const tableOfContents = lesson
+    //     ? extractMarkdownHeadings(lesson.content)
+    //     : [];
 
     if (status === "loading") {
         return (
@@ -227,7 +226,8 @@ export default function LessonPage() {
                     </div>
                 </article>
 
-                <LessonTableOfContents headings={tableOfContents} />
+                {/* Table of Contents have been removed for the mean time */}
+                {/* <LessonTableOfContents headings={tableOfContents} /> */}
             </div>
         </div>
     );

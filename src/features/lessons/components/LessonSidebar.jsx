@@ -9,7 +9,7 @@ export default function LessonSidebar({
 }) {
   return (
     <aside className="hidden w-72 shrink-0 border-r border-border bg-background lg:block">
-      <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto p-4">
+      <div className="sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto scrollbar-hide p-4">
         <div className="mb-4">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Course lessons

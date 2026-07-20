@@ -111,3 +111,18 @@ body {
   background: rgb(var(--background));
   color: rgb(var(--foreground));
 }
+
+/* Chrome, Edge, Safari */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox */
+.scrollbar-hide {
+  scrollbar-width: none;
+}
+
+/* IE/old Edge */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+}

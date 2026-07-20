@@ -1,3 +1,21 @@
+import { isValidElement } from "react";
+
+export function getNodeText(node) {
+  if (typeof node === "string" || typeof node === "number") {
+    return String(node);
+  }
+
+  if (Array.isArray(node)) {
+    return node.map(getNodeText).join("");
+  }
+
+  if (isValidElement(node)) {
+    return getNodeText(node.props.children);
+  }
+
+  return "";
+}
+
 export function slugifyHeading(value) {
   return value
     .toString()

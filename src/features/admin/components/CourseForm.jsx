@@ -7,9 +7,10 @@ import {
 } from "@/shared/components/forms";
 
 const CATEGORY_OPTIONS = [
-  { label: "Programming Language", value: "Language" },
-  { label: "Data Structures", value: "Data Structures" },
-  { label: "Algorithms", value: "Algorithms" },
+  { label: "Programming Language", value: "Programming Language" },
+  { label: "Computer Science Foundations", value: "Computer Science Foundations" },
+  { label: "Web Development", value: "Web Development" },
+  { label: "Databases", value: "Databases" },
 ];
 
 const LEVEL_OPTIONS = [

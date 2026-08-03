@@ -9,7 +9,7 @@ import {
   LoadingState,
 } from "@/shared/components/feedback";
 
-const COURSE_CATEGORIES = ["All", "Language", "Data Structures", "Algorithms", "Web Development", "Database",];
+const COURSE_CATEGORIES = ["All", "Programming Language", "Computer Science Foundations", "Web Development", "Databases",];
 const COURSE_LEVELS = ["All", "Beginner", "Intermediate", "Advanced"];
 
 export default function CoursesPage() {
